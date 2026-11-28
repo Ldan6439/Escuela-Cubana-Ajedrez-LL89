@@ -36,13 +36,18 @@ header h1{color:#667eea;font-size:1.5rem}
 .theme-title:hover{background:#e0e0ff}
 .theme-title .theme-progress{font-size:0.8rem;color:#667eea}
 .theme-exercises{margin-left:10px;margin-top:5px}
-.exercise-item{padding:0.6rem;margin-bottom:0.3rem;background:#f8f9fa;border-radius:6px;cursor:pointer;transition:all 0.3s;border-left:4px solid transparent;font-size:0.85rem}
+.exercise-item{padding:0.6rem;margin-bottom:0.3rem;background:#f8f9fa;border-radius:6px;cursor:pointer;transition:all 0.3s;border-left:4px solid transparent;font-size:0.85rem;display:flex;justify-content:space-between;align-items:center;gap:5px}
 .exercise-item:hover{background:#e9ecef;transform:translateX(3px)}
 .exercise-item.active{background:#667eea;color:white;border-left-color:#764ba2}
 .exercise-item.completed{border-left-color:#2ecc71}
 .exercise-item.failed{border-left-color:#e74c3c}
+.exercise-item-info{flex:1}
 .exercise-item-title{font-weight:bold}
 .exercise-item-status{font-size:0.75rem;opacity:0.8}
+.exercise-item-actions{display:flex;gap:3px}
+.exercise-item-actions button{padding:3px 6px;font-size:0.7rem;border:none;border-radius:3px;cursor:pointer;color:white}
+.btn-edit-ex{background:#f39c12}
+.btn-edit-ex:hover{background:#e67e22}
 #admin-panel{margin-top:2rem;padding-top:1.5rem;border-top:2px solid #eee}
 #admin-panel button,#new-exercise-btn{width:100%;padding:0.8rem;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border:none;border-radius:8px;cursor:pointer;font-size:1rem;margin-bottom:0.5rem}
 #admin-panel button:hover,#new-exercise-btn:hover{opacity:0.9}
@@ -160,7 +165,7 @@ header h1{color:#667eea;font-size:1.5rem}
 <button id="clear-data-btn" style="background:#e74c3c">🗑️ Borrar todos los datos</button>
 </div>
 </aside>
-<main class="board-section">
+<main class="board-section" id="board-section">
 <div id="board-container">
 <div id="chess-board"></div>
 <div id="exercise-info">
@@ -195,8 +200,9 @@ header h1{color:#667eea;font-size:1.5rem}
 <div id="manual-modal" class="modal">
 <div class="modal-content">
 <span class="close" data-modal="manual-modal">&times;</span>
-<h2>➕ Crear ejercicio manual</h2>
+<h2 id="manual-modal-title">➕ Crear ejercicio manual</h2>
 <form id="manual-form">
+<input type="hidden" id="edit-exercise-id" value="">
 <label for="m-title">Título:</label>
 <input type="text" id="m-title" required>
 <label for="m-theme">Tema:</label>
@@ -323,8 +329,10 @@ document.getElementById('confirm-pgn-btn').style.display='none';
 });
 
 document.getElementById('manual-exercise-btn').addEventListener('click',()=>{
-document.getElementById('manual-modal').style.display='block';
+document.getElementById('manual-modal-title').textContent='➕ Crear ejercicio manual';
+document.getElementById('edit-exercise-id').value='';
 document.getElementById('manual-form').reset();
+document.getElementById('manual-modal').style.display='block';
 });
 
 document.getElementById('reports-btn').addEventListener('click',()=>this.showReports());
@@ -545,15 +553,18 @@ title.innerHTML=`<span>📁 ${theme}</span><span class="theme-progress">${comple
 const exercisesDiv=document.createElement('div');
 exercisesDiv.className='theme-exercises';
 exercisesDiv.style.display='none';
-themes[theme].forEach(ex=>{
+themes[theme].forEach((ex,idx)=>{
 const item=document.createElement('div');
 item.className='exercise-item';
 const key=`progress_${this.user.id}_${ex.id}`;
 const progress=JSON.parse(localStorage.getItem(key)||'{}');
 if(progress.completed)item.classList.add('completed');
 else if(progress.attempts>0&&!progress.completed)item.classList.add('failed');
-item.innerHTML=`<div class="exercise-item-title">${ex.title}</div><div class="exercise-item-status">${progress.completed?'✅ Completado':(progress.attempts>0?'❌ Fallido':'⏳ Pendiente')}</div>`;
-item.addEventListener('click',()=>{
+
+const infoDiv=document.createElement('div');
+infoDiv.className='exercise-item-info';
+infoDiv.innerHTML=`<div class="exercise-item-title">${ex.title}</div><div class="exercise-item-status">${progress.completed?'✅ Completado':(progress.attempts>0?'❌ Fallido':'⏳ Pendiente')}</div>`;
+infoDiv.addEventListener('click',()=>{
 this.currentTheme=theme;
 this.currentThemeExercises=themes[theme];
 this.themeIndex=this.currentThemeExercises.findIndex(e=>e.id===ex.id);
@@ -561,6 +572,24 @@ this.loadExercise(ex,true);
 document.querySelectorAll('.exercise-item').forEach(i=>i.classList.remove('active'));
 item.classList.add('active');
 });
+
+item.appendChild(infoDiv);
+
+if(this.user.role==='admin'){
+const actionsDiv=document.createElement('div');
+actionsDiv.className='exercise-item-actions';
+const editBtn=document.createElement('button');
+editBtn.className='btn-edit-ex';
+editBtn.textContent='✏️';
+editBtn.title='Editar ejercicio';
+editBtn.addEventListener('click',(e)=>{
+e.stopPropagation();
+this.openEditExercise(ex);
+});
+actionsDiv.appendChild(editBtn);
+item.appendChild(actionsDiv);
+}
+
 exercisesDiv.appendChild(item);
 });
 title.addEventListener('click',()=>{
@@ -579,6 +608,9 @@ document.querySelectorAll('.exercise-item').forEach(i=>i.classList.remove('activ
 const items=exercisesDiv.querySelectorAll('.exercise-item');
 if(items[targetIndex])items[targetIndex].classList.add('active');
 exercisesDiv.style.display='block';
+setTimeout(()=>{
+document.getElementById('board-section').scrollIntoView({behavior:'smooth',block:'start'});
+},100);
 });
 section.appendChild(title);
 section.appendChild(exercisesDiv);
@@ -608,6 +640,9 @@ document.getElementById('reset-btn').style.display='inline-block';
 document.getElementById('retry-btn').style.display='none';
 document.getElementById('next-btn').style.display='none';
 if(autoStart){const feedback=document.getElementById('move-feedback');feedback.textContent='💡 Juegan '+(this.playerColor==='w'?'blancas':'negras')+'. Haz tu primera jugada.';feedback.className='info'}
+setTimeout(()=>{
+document.getElementById('board-section').scrollIntoView({behavior:'smooth',block:'start'});
+},150);
 }
 
 loadStats(){
@@ -731,25 +766,55 @@ this.loadExercises();
 this.loadStats();
 }
 
+openEditExercise(ex){
+document.getElementById('manual-modal-title').textContent='✏️ Editar ejercicio';
+document.getElementById('edit-exercise-id').value=ex.id;
+document.getElementById('m-title').value=ex.title;
+document.getElementById('m-theme').value=ex.theme||'';
+document.getElementById('m-description').value=ex.description||'';
+document.getElementById('m-fen').value=ex.fen||'';
+document.getElementById('m-color').value=ex.color||'w';
+document.getElementById('m-moves').value=ex.moves;
+document.getElementById('manual-modal').style.display='block';
+}
+
 saveManualExercise(){
 const exercises=JSON.parse(localStorage.getItem('exercises')||'[]');
-const newEx={
-id:Date.now(),
+const editId=document.getElementById('edit-exercise-id').value;
+const exerciseData={
 title:document.getElementById('m-title').value.trim(),
 theme:document.getElementById('m-theme').value.trim(),
 description:document.getElementById('m-description').value.trim(),
 fen:document.getElementById('m-fen').value.trim(),
 color:document.getElementById('m-color').value,
-moves:document.getElementById('m-moves').value.trim(),
-createdBy:this.user.id,
-createdAt:new Date().toISOString()
+moves:document.getElementById('m-moves').value.trim()
 };
-exercises.push(newEx);
+
+if(editId){
+const idx=exercises.findIndex(e=>e.id==editId);
+if(idx>=0){
+exercises[idx]={...exercises[idx],...exerciseData,editedAt:new Date().toISOString()};
+alert('✅ Ejercicio actualizado correctamente.');
+}else{
+alert('❌ Error: ejercicio no encontrado.');
+return;
+}
+}else{
+exerciseData.id=Date.now();
+exerciseData.createdBy=this.user.id;
+exerciseData.createdAt=new Date().toISOString();
+exercises.push(exerciseData);
+alert('✅ Ejercicio creado correctamente.');
+}
+
 localStorage.setItem('exercises',JSON.stringify(exercises));
 document.getElementById('manual-modal').style.display='none';
-alert('✅ Ejercicio creado correctamente.');
 this.loadExercises();
 this.loadStats();
+
+if(this.currentExercise&&this.currentExercise.id==editId){
+this.loadExercise(exercises.find(e=>e.id==editId),true);
+}
 }
 
 showReports(){
