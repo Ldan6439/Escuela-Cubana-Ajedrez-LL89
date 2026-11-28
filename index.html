@@ -3,523 +3,539 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nuestra Donación Libera un País | Ayuda a Profesionales Cubanos</title>
-<meta name="description" content="Campaña solidaria para que profesionales cubanos puedan emigrar y construir una vida próspera. Dona en Bitcoin Cash.">
+<title>Plataforma de Entrenamiento de Ajedrez</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
 <style>
-  :root{
-    --azul:#0b3d91;
-    --azul-claro:#1e5fc1;
-    --rojo:#cf142b;
-    --blanco:#ffffff;
-    --gris:#f4f6fb;
-    --texto:#1a1a1a;
-    --sombra:0 8px 24px rgba(11,61,145,.12);
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{
-    font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
-    color:var(--texto);
-    background:var(--gris);
-    line-height:1.6;
-  }
-  header{
-    background:linear-gradient(135deg,var(--azul) 0%,var(--azul-claro) 100%);
-    color:var(--blanco);
-    padding:60px 20px 80px;
-    text-align:center;
-    position:relative;
-    overflow:hidden;
-  }
-  header::before{
-    content:"";
-    position:absolute;
-    top:-50%;left:-50%;
-    width:200%;height:200%;
-    background:radial-gradient(circle,rgba(255,255,255,.08) 1px,transparent 1px);
-    background-size:30px 30px;
-    animation:drift 60s linear infinite;
-  }
-  @keyframes drift{
-    from{transform:translate(0,0)}
-    to{transform:translate(30px,30px)}
-  }
-  header h1{
-    font-size:clamp(1.8rem,4vw,3rem);
-    margin-bottom:15px;
-    position:relative;
-    z-index:1;
-    text-shadow:0 2px 8px rgba(0,0,0,.3);
-  }
-  header .consigna{
-    font-size:clamp(1.1rem,2.5vw,1.6rem);
-    font-style:italic;
-    margin-top:10px;
-    padding:12px 24px;
-    background:rgba(255,255,255,.12);
-    display:inline-block;
-    border-radius:50px;
-    border:1px solid rgba(255,255,255,.3);
-    position:relative;
-    z-index:1;
-  }
-  header p.sub{
-    max-width:800px;
-    margin:20px auto 0;
-    font-size:1.05rem;
-    position:relative;
-    z-index:1;
-    opacity:.95;
-  }
-  .container{
-    max-width:1100px;
-    margin:-40px auto 0;
-    padding:0 20px;
-    position:relative;
-    z-index:2;
-  }
-  .card{
-    background:var(--blanco);
-    border-radius:16px;
-    padding:35px;
-    margin-bottom:30px;
-    box-shadow:var(--sombra);
-  }
-  .card h2{
-    color:var(--azul);
-    font-size:1.8rem;
-    margin-bottom:18px;
-    border-bottom:3px solid var(--rojo);
-    padding-bottom:10px;
-    display:inline-block;
-  }
-  .card p{margin-bottom:12px}
-  .grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-    gap:20px;
-    margin-top:20px;
-  }
-  .prof{
-    background:var(--gris);
-    padding:20px;
-    border-radius:12px;
-    border-left:4px solid var(--rojo);
-    transition:transform .2s;
-  }
-  .prof:hover{transform:translateY(-3px)}
-  .prof .icon{font-size:2rem;margin-bottom:8px}
-  .prof h3{color:var(--azul);margin-bottom:6px}
-  .donacion-box{
-    background:linear-gradient(135deg,#fff 0%,#f0f4ff 100%);
-    border:2px dashed var(--azul);
-    border-radius:16px;
-    padding:30px;
-    text-align:center;
-  }
-  .bch-address{
-    font-family:'Courier New',monospace;
-    background:#1a1a1a;
-    color:#00ff88;
-    padding:15px;
-    border-radius:8px;
-    word-break:break-all;
-    margin:15px 0;
-    font-size:.95rem;
-    cursor:pointer;
-    transition:background .2s;
-  }
-  .bch-address:hover{background:#2a2a2a}
-  .btn{
-    background:var(--rojo);
-    color:var(--blanco);
-    border:none;
-    padding:12px 28px;
-    border-radius:50px;
-    font-size:1rem;
-    font-weight:bold;
-    cursor:pointer;
-    margin:5px;
-    transition:all .2s;
-    box-shadow:0 4px 12px rgba(207,20,43,.3);
-  }
-  .btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(207,20,43,.4)}
-  .btn.secondary{background:var(--azul);box-shadow:0 4px 12px rgba(11,61,145,.3)}
-  .btn.secondary:hover{box-shadow:0 6px 16px rgba(11,61,145,.4)}
-  #qr{
-    background:var(--blanco);
-    padding:10px;
-    border-radius:12px;
-    display:inline-block;
-    margin:15px 0;
-    box-shadow:var(--sombra);
-  }
-  details{
-    background:var(--blanco);
-    border-radius:12px;
-    padding:20px;
-    margin-top:15px;
-    box-shadow:var(--sombra);
-  }
-  summary{
-    font-weight:bold;
-    color:var(--azul);
-    cursor:pointer;
-    font-size:1.15rem;
-    padding:10px;
-    list-style:none;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-  }
-  summary::after{content:"▼";transition:transform .3s}
-  details[open] summary::after{transform:rotate(180deg)}
-  .ranking{
-    list-style:none;
-    margin-top:15px;
-  }
-  .ranking li{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:12px 15px;
-    background:var(--gris);
-    margin-bottom:8px;
-    border-radius:8px;
-    border-left:4px solid var(--azul);
-  }
-  .ranking li.top1{border-left-color:gold;background:linear-gradient(90deg,#fff8dc,var(--gris))}
-  .ranking li.top2{border-left-color:silver;background:linear-gradient(90deg,#f0f0f0,var(--gris))}
-  .ranking li.top3{border-left-color:#cd7f32;background:linear-gradient(90deg,#faebd7,var(--gris))}
-  .ranking .pos{font-weight:bold;color:var(--azul);min-width:30px}
-  .ranking .monto{font-weight:bold;color:var(--rojo)}
-  .transparencia-table{
-    width:100%;
-    border-collapse:collapse;
-    margin-top:15px;
-    font-size:.95rem;
-  }
-  .transparencia-table th,.transparencia-table td{
-    padding:10px;
-    text-align:left;
-    border-bottom:1px solid #e0e0e0;
-  }
-  .transparencia-table th{background:var(--azul);color:var(--blanco)}
-  .transparencia-table tr:hover{background:var(--gris)}
-  .stats{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-    gap:15px;
-    margin:20px 0;
-  }
-  .stat{
-    background:var(--azul);
-    color:var(--blanco);
-    padding:20px;
-    border-radius:12px;
-    text-align:center;
-  }
-  .stat .num{font-size:2rem;font-weight:bold;display:block}
-  .stat .lbl{font-size:.9rem;opacity:.9}
-  .form-registro{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:10px;
-    margin-top:20px;
-  }
-  .form-registro input,.form-registro select{
-    padding:10px;
-    border:1px solid #ccc;
-    border-radius:8px;
-    font-size:1rem;
-  }
-  .form-registro input:focus,.form-registro select:focus{
-    outline:none;
-    border-color:var(--azul);
-  }
-  .full{grid-column:1/-1}
-  footer{
-    background:var(--azul);
-    color:var(--blanco);
-    text-align:center;
-    padding:30px 20px;
-    margin-top:40px;
-  }
-  footer a{color:#ffd700;text-decoration:none}
-  .alerta{
-    background:#fff3cd;
-    border-left:4px solid #ffc107;
-    padding:12px 18px;
-    border-radius:8px;
-    margin:15px 0;
-    font-size:.95rem;
-  }
-  .toast{
-    position:fixed;
-    bottom:20px;
-    right:20px;
-    background:var(--azul);
-    color:var(--blanco);
-    padding:15px 25px;
-    border-radius:8px;
-    box-shadow:var(--sombra);
-    transform:translateY(100px);
-    opacity:0;
-    transition:all .3s;
-    z-index:1000;
-  }
-  .toast.show{transform:translateY(0);opacity:1}
-  @media(max-width:600px){
-    .form-registro{grid-template-columns:1fr}
-    .card{padding:20px}
-  }
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;color:#333}
+header{background:rgba(255,255,255,0.95);padding:1rem 2rem;box-shadow:0 2px 10px rgba(0,0,0,0.1);display:flex;justify-content:space-between;align-items:center}
+header h1{color:#667eea;font-size:1.5rem}
+#user-info{display:flex;align-items:center;gap:1rem}
+#username-display{font-weight:bold;color:#764ba2}
+#logout-btn{padding:0.5rem 1rem;background:#e74c3c;color:white;border:none;border-radius:5px;cursor:pointer}
+#auth-section{display:flex;justify-content:center;align-items:center;min-height:calc(100vh - 80px);padding:2rem}
+.auth-container{background:white;padding:2rem;border-radius:15px;box-shadow:0 10px 40px rgba(0,0,0,0.2);width:100%;max-width:400px}
+.auth-tabs{display:flex;margin-bottom:2rem;border-bottom:2px solid #eee}
+.tab-btn{flex:1;padding:1rem;background:none;border:none;cursor:pointer;font-size:1rem;color:#999}
+.tab-btn.active{color:#667eea;border-bottom:2px solid #667eea;margin-bottom:-2px}
+.auth-form h2{margin-bottom:1.5rem;color:#333}
+.auth-form input{width:100%;padding:0.8rem;margin-bottom:1rem;border:2px solid #eee;border-radius:8px;font-size:1rem}
+.auth-form input:focus{outline:none;border-color:#667eea}
+.auth-form button{width:100%;padding:1rem;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border:none;border-radius:8px;font-size:1rem;cursor:pointer}
+.error-message{color:#e74c3c;margin-top:1rem;text-align:center;min-height:20px}
+#main-content{padding:2rem}
+.main-layout{display:grid;grid-template-columns:300px 1fr;gap:2rem;max-width:1400px;margin:0 auto}
+.sidebar{background:white;padding:1.5rem;border-radius:15px;box-shadow:0 5px 20px rgba(0,0,0,0.1);height:fit-content}
+.stats-panel{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:2px solid #eee}
+.stats-panel h3,.exercises-list h3,#admin-panel h3{margin-bottom:1rem;color:#667eea}
+.stat-item{display:flex;justify-content:space-between;margin-bottom:0.5rem;font-size:0.9rem}
+.progress-bar{width:100%;height:8px;background:#eee;border-radius:10px;overflow:hidden;margin-top:1rem}
+.progress-fill{height:100%;background:linear-gradient(90deg,#667eea 0%,#764ba2 100%);width:0%;transition:width 0.5s}
+.exercise-item{padding:1rem;margin-bottom:0.5rem;background:#f8f9fa;border-radius:8px;cursor:pointer;transition:all 0.3s;border-left:4px solid transparent}
+.exercise-item:hover{background:#e9ecef;transform:translateX(5px)}
+.exercise-item.active{background:#667eea;color:white;border-left-color:#764ba2}
+.exercise-item.completed{border-left-color:#2ecc71}
+.exercise-item-title{font-weight:bold;margin-bottom:0.3rem}
+.exercise-item-difficulty{font-size:0.8rem;opacity:0.7}
+.exercise-actions{display:flex;gap:5px;margin-top:8px}
+.exercise-actions button{padding:3px 8px;font-size:0.75rem;border:none;border-radius:4px;cursor:pointer;color:white}
+.btn-edit{background:#f39c12}
+.btn-delete{background:#e74c3c}
+#admin-panel{margin-top:2rem;padding-top:1.5rem;border-top:2px solid #eee}
+#new-exercise-btn{width:100%;padding:0.8rem;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border:none;border-radius:8px;cursor:pointer;font-size:1rem}
+.board-section{background:white;padding:2rem;border-radius:15px;box-shadow:0 5px 20px rgba(0,0,0,0.1)}
+#board-container{display:flex;flex-direction:column;align-items:center;gap:2rem}
+#chess-board{display:grid;grid-template-columns:repeat(8,60px);grid-template-rows:repeat(8,60px);border:3px solid #333;box-shadow:0 10px 30px rgba(0,0,0,0.3)}
+.square{width:60px;height:60px;display:flex;align-items:center;justify-content:center;font-size:2.5rem;cursor:pointer;user-select:none}
+.square.light{background:#f0d9b5}
+.square.dark{background:#b58863}
+.square.selected{background:#7fc97f !important}
+.square.valid-move{position:relative}
+.square.valid-move::after{content:'';position:absolute;width:20px;height:20px;background:rgba(0,0,0,0.3);border-radius:50%}
+.square.valid-capture::after{width:50px;height:50px;background:transparent;border:4px solid rgba(0,0,0,0.3);border-radius:50%}
+#exercise-info{text-align:center;max-width:600px}
+#exercise-title{color:#667eea;margin-bottom:1rem}
+#exercise-description{color:#666;margin-bottom:1.5rem}
+#move-controls{display:flex;gap:1rem;justify-content:center;margin-bottom:1rem}
+#move-controls button{padding:0.8rem 1.5rem;background:#667eea;color:white;border:none;border-radius:8px;cursor:pointer;font-size:1rem}
+#move-controls button:hover:not(:disabled){background:#764ba2}
+#move-feedback{padding:1rem;border-radius:8px;font-weight:bold;min-height:50px;display:flex;align-items:center;justify-content:center}
+#move-feedback.correct{background:#d4edda;color:#155724}
+#move-feedback.incorrect{background:#f8d7da;color:#721c24}
+.modal{display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.5)}
+.modal-content{background:white;margin:5% auto;padding:2rem;border-radius:15px;width:90%;max-width:600px;max-height:80vh;overflow-y:auto}
+.close{color:#aaa;float:right;font-size:2rem;font-weight:bold;cursor:pointer}
+.modal-content h2{margin-bottom:1.5rem;color:#667eea}
+.modal-content label{display:block;margin-bottom:0.5rem;font-weight:bold;color:#333;margin-top:10px}
+.modal-content input,.modal-content textarea,.modal-content select{width:100%;padding:0.8rem;margin-bottom:1rem;border:2px solid #eee;border-radius:8px;font-size:1rem;font-family:inherit}
+.modal-content input:focus,.modal-content textarea:focus{outline:none;border-color:#667eea}
+.modal-content button[type="submit"]{width:100%;padding:1rem;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border:none;border-radius:8px;font-size:1rem;cursor:pointer;margin-top:10px}
+@media(max-width:1024px){.main-layout{grid-template-columns:1fr}}
+@media(max-width:768px){#chess-board{grid-template-columns:repeat(8,40px);grid-template-rows:repeat(8,40px)}.square{width:40px;height:40px;font-size:1.8rem}header h1{font-size:1.2rem}}
 </style>
 </head>
 <body>
-
+<div id="app">
 <header>
-  <h1>🕊️ Nuestra Donación Libera un País</h1>
-  <div class="consigna">"Cada pasaje comprado es una voz que se libera"</div>
-  <p class="sub">Campaña internacional solidaria para ayudar a profesionales cubanos a emigrar, trabajar libremente y construir una vida próspera lejos de la represión.</p>
+<h1>♟ Plataforma de Entrenamiento de Ajedrez</h1>
+<div id="user-info" style="display:none">
+<span id="username-display"></span>
+<button id="logout-btn">Cerrar Sesión</button>
+</div>
 </header>
 
-<div class="container">
-
-  <!-- POR QUÉ DONAR -->
-  <div class="card">
-    <h2>¿Por qué es necesaria esta campaña?</h2>
-    <p>En Cuba, desde 1959, rige un <strong>sistema de partido único</strong> en el que toda opinión disidente es silenciada. Las decisiones de los dirigentes son aprobadas por <strong>unanimidad forzada</strong>: no existe oposición legal, no hay elecciones libres, y cualquier voz crítica se enfrenta a la cárcel, el exilio o la desaparición laboral.</p>
-    <p>Esta estructura monopólica ha generado una de las crisis humanitarias y económicas más profundas del hemisferio. Profesionales altamente capacitados viven en la pobreza, sin libertad para ejercer, emprender o expresarse. Muchos desean irse, pero <strong>no tienen recursos para comprar un pasaje de avión</strong>.</p>
-    <p>Tu donación no es caridad: es <strong>liberación concreta</strong>. Cada aporte financia directamente el pasaje aéreo de un profesional que podrá rehacer su vida, aportar al mundo y, desde fuera, seguir ayudando a reconstruir su patria.</p>
-  </div>
-
-  <!-- PROFESIONALES -->
-  <div class="card">
-    <h2>Profesionales valiosos atrapados en Cuba</h2>
-    <p>Detrás de cada pasaje hay una persona formada, talentosa y dispuesta a aportar al mundo. Estos son algunos de los perfiles que esperan tu ayuda:</p>
-    <div class="grid">
-      <div class="prof"><div class="icon">🩺</div><h3>Médicos y enfermeros</h3><p>Formados en las mejores universidades, obligados a ejercer en misiones internacionales del régimen o sin materiales para trabajar.</p></div>
-      <div class="prof"><div class="icon">⚙️</div><h3>Ingenieros</h3><p>Civiles, industriales, informáticos y electrónicos sin acceso a tecnología ni proyectos dignos.</p></div>
-      <div class="prof"><div class="icon">📐</div><h3>Arquitectos</h3><p>Capaces de diseñar ciudades enteras, confinados a reparar viviendas en ruinas.</p></div>
-      <div class="prof"><div class="icon">📚</div><h3>Maestros y profesores</h3><p>Educadores con vocación, trabajando por salarios que no alcanzan para alimentarse.</p></div>
-      <div class="prof"><div class="icon">🎨</div><h3>Artistas</h3><p>Pintores, músicos, escritores y cineistas censurados si su obra no comulga con el partido.</p></div>
-      <div class="prof"><div class="icon">🌾</div><h3>Trabajadores agrícolas</h3><p>Campesinos con conocimiento ancestral de la tierra, sin acceso a mercados libres.</p></div>
-      <div class="prof"><div class="icon">💻</div><h3>Programadores</h3><p>Desarrolladores talentosos sin internet estable ni posibilidad de trabajar remotamente.</p></div>
-      <div class="prof"><div class="icon">⚖️</div><h3>Abogados y economistas</h3><p>Profesionales del derecho y la economía sin independencia profesional posible.</p></div>
-    </div>
-  </div>
-
-  <!-- ESTADÍSTICAS -->
-  <div class="card">
-    <h2>Impacto de tu donación</h2>
-    <div class="stats">
-      <div class="stat"><span class="num" id="stat-donaciones">0</span><span class="lbl">Donaciones registradas</span></div>
-      <div class="stat"><span class="num" id="stat-total">0</span><span class="lbl">USD recaudados</span></div>
-      <div class="stat"><span class="num" id="stat-pasajes">0</span><span class="lbl">Pasajes financiados</span></div>
-      <div class="stat"><span class="num">~$600</span><span class="lbl">Costo promedio por pasaje</span></div>
-    </div>
-  </div>
-
-  <!-- DONACIÓN -->
-  <div class="card">
-    <h2>💚 Cómo donar en Bitcoin Cash (BCH)</h2>
-    <p>Aceptamos donaciones en <strong>Bitcoin Cash (BCH)</strong>, una criptomoneda rápida, de comisiones mínimas y perfecta para transferencias internacionales sin intermediarios.</p>
-    <div class="donacion-box">
-      <p><strong>Envía tu aporte a esta dirección:</strong></p>
-      <div class="bch-address" id="bchAddr" onclick="copiarDireccion()">
-        qz25dfmelxvtjz8esw27mrs2h4ahk2u8rspyzmjugm
-      </div>
-      <div id="qr">
-        <img src="https://api.qrserver.com/api/v1/create-qr-code/?data=bitcoincash:qz25dfmelxvtjz8esw27mrs2h4ahk2u8rspyzmjugm&size=200x200" alt="QR Bitcoin Cash" width="200" height="200">
-      </div>
-      <p style="font-size:.9rem;color:#666">Escanea el código con tu wallet BCH o copia la dirección.</p>
-      <button class="btn" onclick="copiarDireccion()">📋 Copiar dirección</button>
-      <button class="btn secondary" onclick="document.getElementById('form-donar').scrollIntoView({behavior:'smooth'})">✍️ Registrar mi donación</button>
-    </div>
-    <div class="alerta">
-      <strong>⚠️ Importante:</strong> Verifica siempre que la dirección comience con <code>qz25df...</code> antes de enviar. Las criptomonedas no son reversibles.
-    </div>
-  </div>
-
-  <!-- RANKING TOP 10 -->
-  <div class="card">
-    <h2>🏆 Ranking Top 10 de Donantes</h2>
-    <p>Reconocemos públicamente a las empresas y personas que más han aportado. Tu nombre o el de tu empresa puede estar aquí.</p>
-    <details open>
-      <summary>Ver ranking completo ▼</summary>
-      <ul class="ranking" id="ranking-lista">
-        <!-- Se llena dinámicamente -->
-      </ul>
-    </details>
-  </div>
-
-  <!-- REGISTRAR DONACIÓN -->
-  <div class="card" id="form-donar">
-    <h2>✍️ Registra tu donación</h2>
-    <p>Después de realizar tu aporte en BCH, regístralo aquí para que aparezca en el ranking y en la tabla de transparencia. Los datos se almacenan localmente en este navegador hasta su verificación en blockchain.</p>
-    <form class="form-registro" onsubmit="registrarDonacion(event)">
-      <input type="text" id="nombre" placeholder="Nombre o empresa" required>
-      <input type="number" id="monto" placeholder="Monto en USD" min="1" step="0.01" required>
-      <input type="text" id="txid" placeholder="TXID de la transacción (opcional)">
-      <select id="tipo" required>
-        <option value="">Tipo de donante</option>
-        <option value="empresa">Empresa</option>
-        <option value="persona">Persona natural</option>
-        <option value="anonimo">Anónimo</option>
-      </select>
-      <button type="submit" class="btn full">Publicar mi donación</button>
-    </form>
-  </div>
-
-  <!-- TRANSPARENCIA -->
-  <div class="card">
-    <h2>🔍 Transparencia pública</h2>
-    <p>Todas las donaciones y su destino son públicos. Cada BCH recibido se convierte en pasajes aéreos comprados a nombre del profesional beneficiado, cuyos datos se publican con su consentimiento.</p>
-    <table class="transparencia-table">
-      <thead>
-        <tr>
-          <th>Fecha</th>
-          <th>Donante</th>
-          <th>Monto USD</th>
-          <th>TXID</th>
-          <th>Destino</th>
-        </tr>
-      </thead>
-      <tbody id="tabla-transparencia">
-        <!-- Se llena dinámicamente -->
-      </tbody>
-    </table>
-    <p style="margin-top:15px;font-size:.9rem;color:#666">Puedes verificar todas las transacciones en cualquier explorador de BCH (ej: blockchair.com/bitcoin-cash).</p>
-  </div>
-
+<div id="auth-section">
+<div class="auth-container">
+<div class="auth-tabs">
+<button class="tab-btn active" data-tab="login">Iniciar Sesión</button>
+<button class="tab-btn" data-tab="register">Registrarse</button>
+</div>
+<form id="login-form" class="auth-form">
+<h2>Iniciar Sesión</h2>
+<input type="text" id="login-username" placeholder="Usuario" required>
+<input type="password" id="login-password" placeholder="Contraseña" required>
+<button type="submit">Entrar</button>
+<p class="error-message" id="login-error"></p>
+</form>
+<form id="register-form" class="auth-form" style="display:none">
+<h2>Registrarse</h2>
+<input type="text" id="register-username" placeholder="Usuario" required>
+<input type="password" id="register-password" placeholder="Contraseña" required>
+<button type="submit">Registrarse</button>
+<p class="error-message" id="register-error"></p>
+</form>
+</div>
 </div>
 
-<footer>
-  <p><strong>Nuestra Donación Libera un País</strong></p>
-  <p>Campaña ciudadana internacional · Bitcoin Cash: <code>qz25dfmelxvtjz8esw27mrs2h4ahk2u8rspyzmjugm</code></p>
-  <p style="margin-top:10px;font-size:.9rem;opacity:.8">Hecho con ❤️ por la libertad de Cuba · 2026</p>
-</footer>
+<div id="main-content" style="display:none">
+<div class="main-layout">
+<aside class="sidebar">
+<div class="stats-panel">
+<h3>Estadísticas</h3>
+<div class="stat-item"><span>Ejercicios completados:</span><strong id="completed-count">0</strong></div>
+<div class="stat-item"><span>Precisión:</span><strong id="accuracy-percent">0%</strong></div>
+<div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div>
+</div>
+<div class="exercises-list">
+<h3>Ejercicios</h3>
+<div id="exercises-container"></div>
+</div>
+<div id="admin-panel" style="display:none">
+<h3>Panel de Administrador</h3>
+<button id="new-exercise-btn">+ Nuevo Ejercicio</button>
+</div>
+</aside>
+<main class="board-section">
+<div id="board-container">
+<div id="chess-board"></div>
+<div id="exercise-info">
+<h2 id="exercise-title">Selecciona un ejercicio</h2>
+<p id="exercise-description"></p>
+<div id="move-controls">
+<button id="reset-btn">Reiniciar</button>
+</div>
+<div id="move-feedback"></div>
+</div>
+</div>
+</main>
+</div>
+</div>
 
-<div class="toast" id="toast">¡Dirección copiada!</div>
+<div id="exercise-modal" class="modal">
+<div class="modal-content">
+<span class="close">&times;</span>
+<h2 id="modal-title">Nuevo Ejercicio</h2>
+<form id="exercise-form">
+<input type="hidden" id="exercise-id">
+<label for="exercise-title-input">Título:</label>
+<input type="text" id="exercise-title-input" required>
+<label for="exercise-description-input">Descripción:</label>
+<textarea id="exercise-description-input" rows="3"></textarea>
+<label for="exercise-difficulty">Dificultad:</label>
+<select id="exercise-difficulty">
+<option value="easy">Fácil</option>
+<option value="medium" selected>Medio</option>
+<option value="hard">Difícil</option>
+</select>
+<label for="exercise-fen">Posición inicial (FEN) - opcional:</label>
+<input type="text" id="exercise-fen" placeholder="Dejar vacío para posición inicial">
+<label for="exercise-color">Juegan:</label>
+<select id="exercise-color">
+<option value="w">Blancas</option>
+<option value="b">Negras</option>
+</select>
+<label for="pgn-content">Movimientos esperados (separados por espacio):</label>
+<textarea id="pgn-content" rows="8" placeholder="e4 e5 Nf3 Nc6 Bb5 a6" required></textarea>
+<small style="color:#666">Usa notación algebraica. Soporta enroques (O-O), capturas (exd5), promociones (e8=Q), etc.</small>
+<button type="submit">Guardar</button>
+</form>
+</div>
+</div>
+</div>
 
 <script>
-  // Datos iniciales de ejemplo (puedes reemplazarlos por donaciones reales)
-  const donacionesIniciales = [
-    {nombre:"Empresa Solidaria XYZ",monto:5000,tipo:"empresa",fecha:"2026-11-10",txid:"ejemplo1..."},
-    {nombre:"Fundación Libertad",monto:3200,tipo:"empresa",fecha:"2026-11-08",txid:"ejemplo2..."},
-    {nombre:"Carlos M.",monto:1500,tipo:"persona",fecha:"2026-11-05",txid:"ejemplo3..."},
-    {nombre:"Diáspora Cubana Inc.",monto:1200,tipo:"empresa",fecha:"2026-11-03",txid:"ejemplo4..."},
-    {nombre:"Anónimo",monto:800,tipo:"anonimo",fecha:"2026-11-01",txid:"ejemplo5..."},
-    {nombre:"María L.",monto:600,tipo:"persona",fecha:"2026-10-28",txid:"ejemplo6..."},
-    {nombre:"Tech Company ABC",monto:500,tipo:"empresa",fecha:"2026-10-25",txid:"ejemplo7..."},
-    {nombre:"Juan P.",monto:300,tipo:"persona",fecha:"2026-10-22",txid:"ejemplo8..."},
-    {nombre:"Colectivo Artesano",monto:250,tipo:"persona",fecha:"2026-10-20",txid:"ejemplo9..."},
-    {nombre:"Anónimo",monto:200,tipo:"anonimo",fecha:"2026-10-18",txid:"ejemplo10..."},
-    {nombre:"Pedro R.",monto:150,tipo:"persona",fecha:"2026-10-15",txid:"ejemplo11..."}
-  ];
+class ChessApp{
+constructor(){
+this.chess=new Chess();
+this.currentExercise=null;
+this.currentMoveIndex=0;
+this.exerciseMoves=[];
+this.playerColor='w';
+this.correctMoves=0;
+this.incorrectMoves=0;
+this.selectedSquare=null;
+this.user=JSON.parse(localStorage.getItem('currentUser')||'null');
+this.init();
+}
 
-  // Cargar donaciones: iniciales + localStorage
-  function cargarDonaciones(){
-    let donaciones = JSON.parse(localStorage.getItem('donaciones') || 'null');
-    if(!donaciones){
-      donaciones = donacionesIniciales;
-      localStorage.setItem('donaciones',JSON.stringify(donaciones));
-    }
-    return donaciones;
-  }
+init(){
+this.setupEventListeners();
+if(this.user){this.showMainContent();this.loadExercises();this.loadStats()}
+else{this.showAuthSection()}
+}
 
-  function guardarDonaciones(d){
-    localStorage.setItem('donaciones',JSON.stringify(d));
-  }
+setupEventListeners(){
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+btn.addEventListener('click',e=>{
+document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+e.target.classList.add('active');
+const tab=e.target.dataset.tab;
+document.getElementById('login-form').style.display=tab==='login'?'block':'none';
+document.getElementById('register-form').style.display=tab==='register'?'block':'none';
+});
+});
 
-  function actualizarRanking(){
-    const donaciones = cargarDonaciones();
-    donaciones.sort((a,b)=>b.monto-a.monto);
-    const top10 = donaciones.slice(0,10);
-    const lista = document.getElementById('ranking-lista');
-    lista.innerHTML = '';
-    top10.forEach((d,i)=>{
-      const li = document.createElement('li');
-      if(i===0) li.className='top1';
-      else if(i===1) li.className='top2';
-      else if(i===2) li.className='top3';
-      const medalla = i===0?'🥇':i===1?'🥈':i===2?'🥉':`#${i+1}`;
-      const etiqueta = d.tipo==='empresa'?' 🏢':d.tipo==='anonimo'?' 🕶️':' 👤';
-      li.innerHTML = `
-        <span><span class="pos">${medalla}</span> ${d.nombre}${etiqueta}</span>
-        <span class="monto">$${d.monto.toLocaleString('en-US')}</span>
-      `;
-      lista.appendChild(li);
-    });
+document.getElementById('login-form').addEventListener('submit',e=>{
+e.preventDefault();
+const username=document.getElementById('login-username').value;
+const password=document.getElementById('login-password').value;
+const users=JSON.parse(localStorage.getItem('users')||'[]');
+const user=users.find(u=>u.username===username&&u.password===password);
+if(user){
+this.user=user;
+localStorage.setItem('currentUser',JSON.stringify(this.user));
+this.showMainContent();
+this.loadExercises();
+this.loadStats();
+}else{
+document.getElementById('login-error').textContent='Credenciales inválidas';
+}
+});
 
-    // Estadísticas
-    const total = donaciones.reduce((s,d)=>s+Number(d.monto),0);
-    document.getElementById('stat-donaciones').textContent = donaciones.length;
-    document.getElementById('stat-total').textContent = '$'+total.toLocaleString('en-US');
-    document.getElementById('stat-pasajes').textContent = Math.floor(total/600);
+document.getElementById('register-form').addEventListener('submit',e=>{
+e.preventDefault();
+const username=document.getElementById('register-username').value;
+const password=document.getElementById('register-password').value;
+const users=JSON.parse(localStorage.getItem('users')||'[]');
+if(users.find(u=>u.username===username)){
+document.getElementById('register-error').textContent='El usuario ya existe';
+return;
+}
+const newUser={id:Date.now(),username,password,role:'user'};
+users.push(newUser);
+localStorage.setItem('users',JSON.stringify(users));
+this.user=newUser;
+localStorage.setItem('currentUser',JSON.stringify(this.user));
+this.showMainContent();
+this.loadExercises();
+this.loadStats();
+});
 
-    // Tabla transparencia
-    const tbody = document.getElementById('tabla-transparencia');
-    tbody.innerHTML = '';
-    donaciones.slice(0,20).forEach(d=>{
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${d.fecha}</td>
-        <td>${d.nombre}</td>
-        <td>$${Number(d.monto).toLocaleString('en-US')}</td>
-        <td style="font-family:monospace;font-size:.8rem">${d.txid||'-'}</td>
-        <td>Pasaje aéreo</td>
-      `;
-      tbody.appendChild(tr);
-    });
-  }
+document.getElementById('logout-btn').addEventListener('click',()=>{
+localStorage.removeItem('currentUser');
+location.reload();
+});
 
-  function registrarDonacion(e){
-    e.preventDefault();
-    const nombre = document.getElementById('nombre').value.trim();
-    const monto = parseFloat(document.getElementById('monto').value);
-    const txid = document.getElementById('txid').value.trim();
-    const tipo = document.getElementById('tipo').value;
-    if(!nombre||!monto||!tipo){alert('Completa todos los campos');return}
-    const donaciones = cargarDonaciones();
-    donaciones.push({
-      nombre,
-      monto,
-      txid,
-      tipo,
-      fecha:new Date().toISOString().split('T')[0]
-    });
-    guardarDonaciones(donaciones);
-    actualizarRanking();
-    e.target.reset();
-    mostrarToast('¡Donación registrada! Gracias por liberar un país 🕊️');
-  }
+document.getElementById('new-exercise-btn').addEventListener('click',()=>this.openExerciseModal());
+document.querySelector('.close').addEventListener('click',()=>{document.getElementById('exercise-modal').style.display='none'});
+document.getElementById('exercise-form').addEventListener('submit',e=>{e.preventDefault();this.saveExercise()});
+document.getElementById('reset-btn').addEventListener('click',()=>this.resetExercise());
+}
 
-  function copiarDireccion(){
-    const addr = 'qz25dfmelxvtjz8esw27mrs2h4ahk2u8rspyzmjugm';
-    navigator.clipboard.writeText(addr).then(()=>{
-      mostrarToast('¡Dirección BCH copiada!');
-    }).catch(()=>{
-      // Fallback
-      const t = document.createElement('textarea');
-      t.value = addr;
-      document.body.appendChild(t);
-      t.select();
-      document.execCommand('copy');
-      document.body.removeChild(t);
-      mostrarToast('¡Dirección BCH copiada!');
-    });
-  }
+showAuthSection(){
+document.getElementById('auth-section').style.display='flex';
+document.getElementById('main-content').style.display='none';
+document.getElementById('user-info').style.display='none';
+}
 
-  function mostrarToast(msg){
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(()=>t.classList.remove('show'),3000);
-  }
+showMainContent(){
+document.getElementById('auth-section').style.display='none';
+document.getElementById('main-content').style.display='block';
+document.getElementById('user-info').style.display='flex';
+document.getElementById('username-display').textContent=this.user.username;
+if(this.user.role==='admin'){document.getElementById('admin-panel').style.display='block'}
+this.renderBoard();
+}
 
-  // Inicializar
-  actualizarRanking();
+renderBoard(){
+const boardEl=document.getElementById('chess-board');
+boardEl.innerHTML='';
+const board=this.chess.board();
+for(let row=0;row<8;row++){
+for(let col=0;col<8;col++){
+const sq=document.createElement('div');
+sq.className=`square ${(row+col)%2===0?'light':'dark'}`;
+sq.dataset.row=row;
+sq.dataset.col=col;
+const piece=board[row][col];
+if(piece){sq.textContent=this.getPieceSymbol(piece)}
+sq.addEventListener('click',()=>this.handleSquareClick(row,col));
+boardEl.appendChild(sq);
+}
+}
+}
+
+getPieceSymbol(piece){
+const symbols={
+'w':{'k':'♔','q':'♕','r':'♖','b':'♗','n':'♘','p':'♙'},
+'b':{'k':'♚','q':'♛','r':'♜','b':'♝','n':'♞','p':'♟'}
+};
+return symbols[piece.color][piece.type];
+}
+
+coordsToSquare(row,col){return String.fromCharCode(97+col)+(8-row)}
+squareToCoords(sq){return{row:8-parseInt(sq[1]),col:sq.charCodeAt(0)-97}}
+
+handleSquareClick(row,col){
+if(!this.currentExercise)return;
+const board=this.chess.board();
+const piece=board[row][col];
+const sqName=this.coordsToSquare(row,col);
+
+if(this.selectedSquare){
+const fromSq=this.selectedSquare;
+try{
+const moveObj={from:fromSq,to:sqName};
+if(piece&&piece.type==='p'&&((piece.color==='w'&&row===0)||(piece.color==='b'&&row===7))){
+moveObj.promotion='q';
+}
+const result=this.chess.move(moveObj);
+if(result){
+this.checkMove(result);
+this.selectedSquare=null;
+this.renderBoard();
+}else{
+this.selectedSquare=null;
+this.renderBoard();
+}
+}catch(e){
+this.selectedSquare=null;
+this.renderBoard();
+}
+}else if(piece&&piece.color===this.chess.turn()&&piece.color===this.playerColor){
+this.selectedSquare=sqName;
+this.renderBoard();
+const squares=document.querySelectorAll('.square');
+squares[row*8+col].classList.add('selected');
+const moves=this.chess.moves({square:sqName,verbose:true});
+moves.forEach(m=>{
+const tc=this.squareToCoords(m.to);
+const targetSq=squares[tc.row*8+tc.col];
+targetSq.classList.add(m.captured?'valid-capture':'valid-move');
+});
+}
+}
+
+checkMove(move){
+if(this.currentMoveIndex>=this.exerciseMoves.length)return;
+const expected=this.exerciseMoves[this.currentMoveIndex];
+const feedback=document.getElementById('move-feedback');
+
+if(move.san===expected){
+this.correctMoves++;
+feedback.textContent='¡Correcto! ✓ ('+move.san+')';
+feedback.className='correct';
+this.currentMoveIndex++;
+if(this.currentMoveIndex>=this.exerciseMoves.length){
+setTimeout(()=>{
+feedback.textContent='¡Ejercicio completado! 🎉';
+this.saveProgress(true);
+this.loadStats();
+this.loadExercises();
+},500);
+}else{
+this.saveProgress(false);
+this.loadStats();
+}
+}else{
+this.incorrectMoves++;
+feedback.textContent='Incorrecto ✗ (esperado: '+expected+', hiciste: '+move.san+')';
+feedback.className='incorrect';
+this.chess.undo();
+this.saveProgress(false);
+this.loadStats();
+}
+}
+
+saveProgress(completed){
+if(!this.currentExercise)return;
+const key=`progress_${this.user.id}_${this.currentExercise.id}`;
+const existing=JSON.parse(localStorage.getItem(key)||'{"correct":0,"incorrect":0,"completed":false}');
+const data={
+correct:existing.correct+this.correctMoves,
+incorrect:existing.incorrect+this.incorrectMoves,
+completed:completed||existing.completed
+};
+localStorage.setItem(key,JSON.stringify(data));
+}
+
+loadExercises(){
+const exercises=JSON.parse(localStorage.getItem('exercises')||'[]');
+this.renderExercisesList(exercises);
+}
+
+renderExercisesList(exercises){
+const c=document.getElementById('exercises-container');
+c.innerHTML='';
+if(exercises.length===0){
+c.innerHTML='<p style="color:#999;text-align:center;padding:1rem">No hay ejercicios aún</p>';
+return;
+}
+exercises.forEach(ex=>{
+const item=document.createElement('div');
+item.className='exercise-item';
+const key=`progress_${this.user.id}_${ex.id}`;
+const progress=JSON.parse(localStorage.getItem(key)||'{}');
+if(progress.completed)item.classList.add('completed');
+item.innerHTML=`
+<div class="exercise-item-title">${ex.title}</div>
+<div class="exercise-item-difficulty">${this.getDifficultyLabel(ex.difficulty)}</div>
+${this.user.role==='admin'?`<div class="exercise-actions">
+<button class="btn-edit" data-id="${ex.id}">Editar</button>
+<button class="btn-delete" data-id="${ex.id}">Eliminar</button>
+</div>`:''}
+`;
+item.addEventListener('click',e=>{
+if(e.target.classList.contains('btn-edit')){
+e.stopPropagation();
+this.openExerciseModal(ex);
+}else if(e.target.classList.contains('btn-delete')){
+e.stopPropagation();
+if(confirm('¿Eliminar este ejercicio?')){this.deleteExercise(ex.id)}
+}else{
+this.loadExercise(ex);
+document.querySelectorAll('.exercise-item').forEach(i=>i.classList.remove('active'));
+item.classList.add('active');
+}
+});
+c.appendChild(item);
+});
+}
+
+getDifficultyLabel(d){return{'easy':'Fácil','medium':'Medio','hard':'Difícil'}[d]||'Medio'}
+
+loadExercise(ex){
+this.currentExercise=ex;
+this.currentMoveIndex=0;
+this.correctMoves=0;
+this.incorrectMoves=0;
+this.selectedSquare=null;
+document.getElementById('exercise-title').textContent=ex.title;
+document.getElementById('exercise-description').textContent=ex.description||'';
+this.exerciseMoves=ex.moves.trim().split(/\s+/).filter(m=>m);
+this.playerColor=ex.color||'w';
+if(ex.fen&&ex.fen.trim()){
+try{this.chess.load(ex.fen)}catch(e){this.chess.reset()}
+}else{
+this.chess.reset();
+}
+this.renderBoard();
+document.getElementById('move-feedback').textContent='';
+document.getElementById('move-feedback').className='';
+}
+
+resetExercise(){if(this.currentExercise)this.loadExercise(this.currentExercise)}
+
+loadStats(){
+const exercises=JSON.parse(localStorage.getItem('exercises')||'[]');
+let completed=0,totalCorrect=0,totalIncorrect=0;
+exercises.forEach(ex=>{
+const key=`progress_${this.user.id}_${ex.id}`;
+const p=JSON.parse(localStorage.getItem(key)||'{}');
+if(p.completed)completed++;
+totalCorrect+=p.correct||0;
+totalIncorrect+=p.incorrect||0;
+});
+const acc=totalCorrect+totalIncorrect>0?((totalCorrect/(totalCorrect+totalIncorrect))*100).toFixed(1):0;
+document.getElementById('completed-count').textContent=completed;
+document.getElementById('accuracy-percent').textContent=acc+'%';
+const pct=exercises.length>0?(completed/exercises.length*100):0;
+document.getElementById('progress-fill').style.width=pct+'%';
+}
+
+openExerciseModal(ex=null){
+const modal=document.getElementById('exercise-modal');
+const form=document.getElementById('exercise-form');
+form.reset();
+if(ex){
+document.getElementById('modal-title').textContent='Editar Ejercicio';
+document.getElementById('exercise-id').value=ex.id;
+document.getElementById('exercise-title-input').value=ex.title;
+document.getElementById('exercise-description-input').value=ex.description||'';
+document.getElementById('exercise-difficulty').value=ex.difficulty;
+document.getElementById('exercise-fen').value=ex.fen||'';
+document.getElementById('exercise-color').value=ex.color||'w';
+document.getElementById('pgn-content').value=ex.moves;
+}else{
+document.getElementById('modal-title').textContent='Nuevo Ejercicio';
+document.getElementById('exercise-id').value='';
+}
+modal.style.display='block';
+}
+
+saveExercise(){
+const exercises=JSON.parse(localStorage.getItem('exercises')||'[]');
+const id=document.getElementById('exercise-id').value;
+const data={
+title:document.getElementById('exercise-title-input').value,
+description:document.getElementById('exercise-description-input').value,
+difficulty:document.getElementById('exercise-difficulty').value,
+fen:document.getElementById('exercise-fen').value,
+color:document.getElementById('exercise-color').value,
+moves:document.getElementById('pgn-content').value
+};
+if(id){
+const idx=exercises.findIndex(e=>e.id==id);
+if(idx>=0){exercises[idx]={...exercises[idx],...data}}
+}else{
+data.id=Date.now();
+data.createdBy=this.user.id;
+exercises.push(data);
+}
+localStorage.setItem('exercises',JSON.stringify(exercises));
+document.getElementById('exercise-modal').style.display='none';
+this.loadExercises();
+}
+
+deleteExercise(id){
+let exercises=JSON.parse(localStorage.getItem('exercises')||'[]');
+exercises=exercises.filter(e=>e.id!=id);
+localStorage.setItem('exercises',JSON.stringify(exercises));
+this.loadExercises();
+this.loadStats();
+}
+}
+
+// Crear admin por defecto
+if(!localStorage.getItem('users')){
+localStorage.setItem('users',JSON.stringify([{id:1,username:'admin',password:'admin123',role:'admin'}]));
+}
+
+// Ejemplo de ejercicio por defecto si no hay ninguno
+if(!localStorage.getItem('exercises')){
+localStorage.setItem('exercises',JSON.stringify([{
+id:1000,
+title:'Apertura Italiana - Ejemplo',
+description:'Practica los primeros movimientos de la Apertura Italiana',
+difficulty:'easy',
+fen:'',
+color:'w',
+moves:'e4 e5 Nf3 Nc6 Bc4 Bc5',
+createdBy:1
+}]));
+}
+
+document.addEventListener('DOMContentLoaded',()=>{new ChessApp()});
 </script>
-
 </body>
 </html>
