@@ -8,7 +8,7 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;color:#333}
-header{background:rgba(255,255,255,0.95);padding:1rem 2rem;box-shadow:0 2px 10px rgba(0,0,0,0.1);display:flex;justify-content:space-between;align-items:center}
+header{background:rgba(255,255,255,0.95);padding:1rem 2rem;box-shadow:0 2px 10px rgba(0,0,0,0.1);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
 header h1{color:#667eea;font-size:1.5rem}
 #user-info{display:flex;align-items:center;gap:1rem}
 #username-display{font-weight:bold;color:#764ba2}
@@ -24,54 +24,70 @@ header h1{color:#667eea;font-size:1.5rem}
 .auth-form button{width:100%;padding:1rem;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border:none;border-radius:8px;font-size:1rem;cursor:pointer}
 .error-message{color:#e74c3c;margin-top:1rem;text-align:center;min-height:20px}
 #main-content{padding:2rem}
-.main-layout{display:grid;grid-template-columns:300px 1fr;gap:2rem;max-width:1400px;margin:0 auto}
-.sidebar{background:white;padding:1.5rem;border-radius:15px;box-shadow:0 5px 20px rgba(0,0,0,0.1);height:fit-content}
+.main-layout{display:grid;grid-template-columns:320px 1fr;gap:2rem;max-width:1500px;margin:0 auto}
+.sidebar{background:white;padding:1.5rem;border-radius:15px;box-shadow:0 5px 20px rgba(0,0,0,0.1);height:fit-content;max-height:85vh;overflow-y:auto}
 .stats-panel{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:2px solid #eee}
 .stats-panel h3,.exercises-list h3,#admin-panel h3{margin-bottom:1rem;color:#667eea}
 .stat-item{display:flex;justify-content:space-between;margin-bottom:0.5rem;font-size:0.9rem}
 .progress-bar{width:100%;height:8px;background:#eee;border-radius:10px;overflow:hidden;margin-top:1rem}
 .progress-fill{height:100%;background:linear-gradient(90deg,#667eea 0%,#764ba2 100%);width:0%;transition:width 0.5s}
-.exercise-item{padding:1rem;margin-bottom:0.5rem;background:#f8f9fa;border-radius:8px;cursor:pointer;transition:all 0.3s;border-left:4px solid transparent}
-.exercise-item:hover{background:#e9ecef;transform:translateX(5px)}
+.theme-section{margin-bottom:1rem}
+.theme-title{font-weight:bold;color:#764ba2;padding:0.5rem;background:#f0f0ff;border-radius:5px;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.theme-title:hover{background:#e0e0ff}
+.theme-exercises{margin-left:10px;margin-top:5px}
+.exercise-item{padding:0.7rem;margin-bottom:0.3rem;background:#f8f9fa;border-radius:6px;cursor:pointer;transition:all 0.3s;border-left:4px solid transparent;font-size:0.9rem}
+.exercise-item:hover{background:#e9ecef;transform:translateX(3px)}
 .exercise-item.active{background:#667eea;color:white;border-left-color:#764ba2}
 .exercise-item.completed{border-left-color:#2ecc71}
-.exercise-item-title{font-weight:bold;margin-bottom:0.3rem}
-.exercise-item-difficulty{font-size:0.8rem;opacity:0.7}
-.exercise-actions{display:flex;gap:5px;margin-top:8px}
-.exercise-actions button{padding:3px 8px;font-size:0.75rem;border:none;border-radius:4px;cursor:pointer;color:white}
-.btn-edit{background:#f39c12}
-.btn-delete{background:#e74c3c}
+.exercise-item-title{font-weight:bold}
+.exercise-item-status{font-size:0.75rem;opacity:0.8}
 #admin-panel{margin-top:2rem;padding-top:1.5rem;border-top:2px solid #eee}
-#new-exercise-btn{width:100%;padding:0.8rem;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border:none;border-radius:8px;cursor:pointer;font-size:1rem}
+#admin-panel button,#new-exercise-btn{width:100%;padding:0.8rem;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border:none;border-radius:8px;cursor:pointer;font-size:1rem;margin-bottom:0.5rem}
+#admin-panel button:hover,#new-exercise-btn:hover{opacity:0.9}
 .board-section{background:white;padding:2rem;border-radius:15px;box-shadow:0 5px 20px rgba(0,0,0,0.1)}
-#board-container{display:flex;flex-direction:column;align-items:center;gap:2rem}
-#chess-board{display:grid;grid-template-columns:repeat(8,60px);grid-template-rows:repeat(8,60px);border:3px solid #333;box-shadow:0 10px 30px rgba(0,0,0,0.3)}
-.square{width:60px;height:60px;display:flex;align-items:center;justify-content:center;font-size:2.5rem;cursor:pointer;user-select:none}
-.square.light{background:#f0d9b5}
-.square.dark{background:#b58863}
+#board-container{display:flex;flex-direction:column;align-items:center;gap:1.5rem}
+#chess-board{display:grid;grid-template-columns:repeat(8,65px);grid-template-rows:repeat(8,65px);border:3px solid #333;box-shadow:0 10px 30px rgba(0,0,0,0.3);position:relative}
+.square{width:65px;height:65px;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;position:relative}
+.square.light{background:#ffffff}
+.square.dark{background:#7ba4d4}
 .square.selected{background:#7fc97f !important}
-.square.valid-move{position:relative}
-.square.valid-move::after{content:'';position:absolute;width:20px;height:20px;background:rgba(0,0,0,0.3);border-radius:50%}
-.square.valid-capture::after{width:50px;height:50px;background:transparent;border:4px solid rgba(0,0,0,0.3);border-radius:50%}
-#exercise-info{text-align:center;max-width:600px}
-#exercise-title{color:#667eea;margin-bottom:1rem}
-#exercise-description{color:#666;margin-bottom:1.5rem}
-#move-controls{display:flex;gap:1rem;justify-content:center;margin-bottom:1rem}
-#move-controls button{padding:0.8rem 1.5rem;background:#667eea;color:white;border:none;border-radius:8px;cursor:pointer;font-size:1rem}
-#move-controls button:hover:not(:disabled){background:#764ba2}
-#move-feedback{padding:1rem;border-radius:8px;font-weight:bold;min-height:50px;display:flex;align-items:center;justify-content:center}
+.square.valid-move::after{content:'';position:absolute;width:22px;height:22px;background:rgba(0,0,0,0.25);border-radius:50%;pointer-events:none}
+.square.valid-capture::after{content:'';position:absolute;width:55px;height:55px;background:transparent;border:4px solid rgba(200,0,0,0.5);border-radius:50%;pointer-events:none}
+.square img{width:58px;height:58px;pointer-events:none}
+.coord{position:absolute;font-size:13px;font-weight:bold;color:#cc0000;pointer-events:none;z-index:2}
+.coord-rank{top:2px;left:4px}
+.coord-file{bottom:2px;right:4px}
+#exercise-info{text-align:center;max-width:650px}
+#exercise-title{color:#667eea;margin-bottom:0.5rem;font-size:1.4rem}
+#exercise-theme{color:#764ba2;font-size:0.95rem;margin-bottom:0.5rem;font-style:italic}
+#exercise-description{color:#666;margin-bottom:1rem}
+#move-counter{color:#555;font-size:0.9rem;margin-bottom:1rem}
+#move-controls{display:flex;gap:0.8rem;justify-content:center;margin-bottom:1rem;flex-wrap:wrap}
+#move-controls button{padding:0.8rem 1.3rem;background:#667eea;color:white;border:none;border-radius:8px;cursor:pointer;font-size:1rem;transition:all 0.3s}
+#move-controls button:hover:not(:disabled){background:#764ba2;transform:translateY(-2px)}
+#move-controls button:disabled{background:#ccc;cursor:not-allowed}
+#move-controls button.retry-btn{background:#f39c12}
+#move-controls button.retry-btn:hover:not(:disabled){background:#e67e22}
+#move-controls button.next-btn{background:#27ae60}
+#move-controls button.next-btn:hover:not(:disabled){background:#229954}
+#move-feedback{padding:1rem;border-radius:8px;font-weight:bold;min-height:50px;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
 #move-feedback.correct{background:#d4edda;color:#155724}
 #move-feedback.incorrect{background:#f8d7da;color:#721c24}
+#move-feedback.info{background:#d1ecf1;color:#0c5460}
 .modal{display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.5)}
-.modal-content{background:white;margin:5% auto;padding:2rem;border-radius:15px;width:90%;max-width:600px;max-height:80vh;overflow-y:auto}
+.modal-content{background:white;margin:3% auto;padding:2rem;border-radius:15px;width:90%;max-width:700px;max-height:90vh;overflow-y:auto}
 .close{color:#aaa;float:right;font-size:2rem;font-weight:bold;cursor:pointer}
+.close:hover{color:#000}
 .modal-content h2{margin-bottom:1.5rem;color:#667eea}
-.modal-content label{display:block;margin-bottom:0.5rem;font-weight:bold;color:#333;margin-top:10px}
-.modal-content input,.modal-content textarea,.modal-content select{width:100%;padding:0.8rem;margin-bottom:1rem;border:2px solid #eee;border-radius:8px;font-size:1rem;font-family:inherit}
+.modal-content label{display:block;margin-bottom:0.5rem;font-weight:bold;color:#333;margin-top:12px}
+.modal-content input,.modal-content textarea,.modal-content select{width:100%;padding:0.8rem;margin-bottom:0.5rem;border:2px solid #eee;border-radius:8px;font-size:1rem;font-family:inherit}
 .modal-content input:focus,.modal-content textarea:focus{outline:none;border-color:#667eea}
-.modal-content button[type="submit"]{width:100%;padding:1rem;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border:none;border-radius:8px;font-size:1rem;cursor:pointer;margin-top:10px}
-@media(max-width:1024px){.main-layout{grid-template-columns:1fr}}
-@media(max-width:768px){#chess-board{grid-template-columns:repeat(8,40px);grid-template-rows:repeat(8,40px)}.square{width:40px;height:40px;font-size:1.8rem}header h1{font-size:1.2rem}}
+.modal-content button[type="submit"]{width:100%;padding:1rem;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border:none;border-radius:8px;font-size:1rem;cursor:pointer;margin-top:15px}
+.modal-content small{color:#666;display:block;margin-bottom:10px}
+.pgn-preview{background:#f8f9fa;padding:1rem;border-radius:8px;margin-top:1rem;max-height:200px;overflow-y:auto;font-family:monospace;font-size:0.85rem}
+.pgn-exercise-item{padding:0.5rem;margin-bottom:0.3rem;background:white;border-radius:4px;border-left:3px solid #667eea}
+@media(max-width:1024px){.main-layout{grid-template-columns:1fr}.sidebar{max-height:none}}
+@media(max-width:768px){#chess-board{grid-template-columns:repeat(8,42px);grid-template-rows:repeat(8,42px)}.square{width:42px;height:42px}.square img{width:38px;height:38px}.coord{font-size:10px}header h1{font-size:1.1rem}#move-controls button{padding:0.6rem 0.9rem;font-size:0.9rem}}
 </style>
 </head>
 <body>
@@ -111,28 +127,35 @@ header h1{color:#667eea;font-size:1.5rem}
 <div class="main-layout">
 <aside class="sidebar">
 <div class="stats-panel">
-<h3>Estadísticas</h3>
+<h3>📊 Estadísticas</h3>
 <div class="stat-item"><span>Ejercicios completados:</span><strong id="completed-count">0</strong></div>
 <div class="stat-item"><span>Precisión:</span><strong id="accuracy-percent">0%</strong></div>
+<div class="stat-item"><span>Temas dominados:</span><strong id="themes-count">0</strong></div>
 <div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div>
 </div>
 <div class="exercises-list">
-<h3>Ejercicios</h3>
+<h3>📚 Ejercicios por Tema</h3>
 <div id="exercises-container"></div>
 </div>
 <div id="admin-panel" style="display:none">
-<h3>Panel de Administrador</h3>
-<button id="new-exercise-btn">+ Nuevo Ejercicio</button>
+<h3>🔐 Panel de Administrador</h3>
+<button id="upload-pgn-btn">📤 Cargar archivo PGN</button>
+<button id="manual-exercise-btn">➕ Ejercicio manual</button>
+<button id="clear-data-btn" style="background:#e74c3c">🗑️ Borrar todos los datos</button>
 </div>
 </aside>
 <main class="board-section">
 <div id="board-container">
 <div id="chess-board"></div>
 <div id="exercise-info">
-<h2 id="exercise-title">Selecciona un ejercicio</h2>
-<p id="exercise-description"></p>
+<h2 id="exercise-title">Bienvenido</h2>
+<p id="exercise-theme"></p>
+<p id="exercise-description">Selecciona un ejercicio del panel izquierdo para comenzar. Como administrador, puedes cargar archivos PGN con múltiples ejercicios organizados por tema.</p>
+<div id="move-counter"></div>
 <div id="move-controls">
-<button id="reset-btn">Reiniciar</button>
+<button id="reset-btn" style="display:none">🔄 Reiniciar</button>
+<button id="retry-btn" class="retry-btn" style="display:none">🔁 Intentar de nuevo</button>
+<button id="next-btn" class="next-btn" style="display:none">➡️ Siguiente ejercicio</button>
 </div>
 <div id="move-feedback"></div>
 </div>
@@ -141,49 +164,65 @@ header h1{color:#667eea;font-size:1.5rem}
 </div>
 </div>
 
-<div id="exercise-modal" class="modal">
+<div id="pgn-modal" class="modal">
 <div class="modal-content">
-<span class="close">&times;</span>
-<h2 id="modal-title">Nuevo Ejercicio</h2>
-<form id="exercise-form">
-<input type="hidden" id="exercise-id">
-<label for="exercise-title-input">Título:</label>
-<input type="text" id="exercise-title-input" required>
-<label for="exercise-description-input">Descripción:</label>
-<textarea id="exercise-description-input" rows="3"></textarea>
-<label for="exercise-difficulty">Dificultad:</label>
-<select id="exercise-difficulty">
-<option value="easy">Fácil</option>
-<option value="medium" selected>Medio</option>
-<option value="hard">Difícil</option>
-</select>
-<label for="exercise-fen">Posición inicial (FEN) - opcional:</label>
-<input type="text" id="exercise-fen" placeholder="Dejar vacío para posición inicial">
-<label for="exercise-color">Juegan:</label>
-<select id="exercise-color">
+<span class="close" data-modal="pgn-modal">&times;</span>
+<h2>📤 Cargar archivo PGN</h2>
+<p style="color:#666;margin-bottom:1rem">Sube un archivo PGN con múltiples ejercicios. Cada partida será un ejercicio separado. Agrupa los ejercicios por tema usando el campo [Site "Nombre del tema"].</p>
+<label for="pgn-file-input">Seleccionar archivo PGN:</label>
+<input type="file" id="pgn-file-input" accept=".pgn,.txt">
+<div id="pgn-preview" class="pgn-preview" style="display:none"></div>
+<button id="confirm-pgn-btn" style="display:none;margin-top:15px;width:100%;padding:1rem;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border:none;border-radius:8px;font-size:1rem;cursor:pointer">✅ Confirmar y guardar ejercicios</button>
+</div>
+</div>
+
+<div id="manual-modal" class="modal">
+<div class="modal-content">
+<span class="close" data-modal="manual-modal">&times;</span>
+<h2>➕ Crear ejercicio manual</h2>
+<form id="manual-form">
+<label for="m-title">Título:</label>
+<input type="text" id="m-title" required>
+<label for="m-theme">Tema:</label>
+<input type="text" id="m-theme" required placeholder="Ej: Aperturas, Finales de torre, etc.">
+<label for="m-description">Descripción (opcional):</label>
+<textarea id="m-description" rows="2"></textarea>
+<label for="m-fen">Posición inicial FEN (opcional):</label>
+<input type="text" id="m-fen" placeholder="Dejar vacío para posición inicial">
+<label for="m-color">Juegan:</label>
+<select id="m-color">
 <option value="w">Blancas</option>
 <option value="b">Negras</option>
 </select>
-<label for="pgn-content">Movimientos esperados (separados por espacio):</label>
-<textarea id="pgn-content" rows="8" placeholder="e4 e5 Nf3 Nc6 Bb5 a6" required></textarea>
-<small style="color:#666">Usa notación algebraica. Soporta enroques (O-O), capturas (exd5), promociones (e8=Q), etc.</small>
-<button type="submit">Guardar</button>
+<label for="m-moves">Movimientos esperados (separados por espacio):</label>
+<textarea id="m-moves" rows="4" placeholder="e4 e5 Nf3 Nc6 Bc4 Bc5" required></textarea>
+<small>Notación algebraica estándar. Enroques: O-O / O-O-O. Capturas: exd5. Promociones: e8=Q</small>
+<button type="submit">Guardar ejercicio</button>
 </form>
 </div>
 </div>
 </div>
 
 <script>
+const PIECE_IMAGES={
+'w':{'k':'https://upload.wikimedia.org/wikipedia/commons/4/42/Chess_klt45.svg','q':'https://upload.wikimedia.org/wikipedia/commons/1/15/Chess_qlt45.svg','r':'https://upload.wikimedia.org/wikipedia/commons/7/72/Chess_rlt45.svg','b':'https://upload.wikimedia.org/wikipedia/commons/b/b1/Chess_blt45.svg','n':'https://upload.wikimedia.org/wikipedia/commons/7/70/Chess_nlt45.svg','p':'https://upload.wikimedia.org/wikipedia/commons/4/45/Chess_plt45.svg'},
+'b':{'k':'https://upload.wikimedia.org/wikipedia/commons/f/f0/Chess_kdt45.svg','q':'https://upload.wikimedia.org/wikipedia/commons/4/47/Chess_qdt45.svg','r':'https://upload.wikimedia.org/wikipedia/commons/f/ff/Chess_rdt45.svg','b':'https://upload.wikimedia.org/wikipedia/commons/9/98/Chess_bdt45.svg','n':'https://upload.wikimedia.org/wikipedia/commons/e/ef/Chess_ndt45.svg','p':'https://upload.wikimedia.org/wikipedia/commons/c/c7/Chess_pdt45.svg'}
+};
+
 class ChessApp{
 constructor(){
 this.chess=new Chess();
 this.currentExercise=null;
+this.currentTheme=null;
+this.currentThemeExercises=[];
+this.themeIndex=0;
 this.currentMoveIndex=0;
 this.exerciseMoves=[];
 this.playerColor='w';
 this.correctMoves=0;
 this.incorrectMoves=0;
 this.selectedSquare=null;
+this.lastError=null;
 this.user=JSON.parse(localStorage.getItem('currentUser')||'null');
 this.init();
 }
@@ -207,7 +246,7 @@ document.getElementById('register-form').style.display=tab==='register'?'block':
 
 document.getElementById('login-form').addEventListener('submit',e=>{
 e.preventDefault();
-const username=document.getElementById('login-username').value;
+const username=document.getElementById('login-username').value.trim();
 const password=document.getElementById('login-password').value;
 const users=JSON.parse(localStorage.getItem('users')||'[]');
 const user=users.find(u=>u.username===username&&u.password===password);
@@ -224,8 +263,9 @@ document.getElementById('login-error').textContent='Credenciales inválidas';
 
 document.getElementById('register-form').addEventListener('submit',e=>{
 e.preventDefault();
-const username=document.getElementById('register-username').value;
+const username=document.getElementById('register-username').value.trim();
 const password=document.getElementById('register-password').value;
+if(!username||!password)return;
 const users=JSON.parse(localStorage.getItem('users')||'[]');
 if(users.find(u=>u.username===username)){
 document.getElementById('register-error').textContent='El usuario ya existe';
@@ -246,10 +286,48 @@ localStorage.removeItem('currentUser');
 location.reload();
 });
 
-document.getElementById('new-exercise-btn').addEventListener('click',()=>this.openExerciseModal());
-document.querySelector('.close').addEventListener('click',()=>{document.getElementById('exercise-modal').style.display='none'});
-document.getElementById('exercise-form').addEventListener('submit',e=>{e.preventDefault();this.saveExercise()});
+document.getElementById('upload-pgn-btn').addEventListener('click',()=>{
+document.getElementById('pgn-modal').style.display='block';
+document.getElementById('pgn-file-input').value='';
+document.getElementById('pgn-preview').style.display='none';
+document.getElementById('pgn-preview').innerHTML='';
+document.getElementById('confirm-pgn-btn').style.display='none';
+});
+
+document.getElementById('manual-exercise-btn').addEventListener('click',()=>{
+document.getElementById('manual-modal').style.display='block';
+document.getElementById('manual-form').reset();
+});
+
+document.getElementById('clear-data-btn').addEventListener('click',()=>{
+if(confirm('¿Seguro que quieres borrar TODOS los ejercicios y progreso? Esta acción no se puede deshacer.')){
+localStorage.removeItem('exercises');
+localStorage.removeItem('themes');
+const keys=Object.keys(localStorage);
+keys.forEach(k=>{if(k.startsWith('progress_'))localStorage.removeItem(k)});
+this.loadExercises();
+this.loadStats();
+alert('Datos borrados correctamente');
+}
+});
+
+document.getElementById('pgn-file-input').addEventListener('change',e=>this.handlePgnFile(e));
+document.getElementById('confirm-pgn-btn').addEventListener('click',()=>this.confirmPgnImport());
+document.getElementById('manual-form').addEventListener('submit',e=>{e.preventDefault();this.saveManualExercise()});
+
+document.querySelectorAll('.close').forEach(btn=>{
+btn.addEventListener('click',()=>{
+document.getElementById(btn.dataset.modal).style.display='none';
+});
+});
+
 document.getElementById('reset-btn').addEventListener('click',()=>this.resetExercise());
+document.getElementById('retry-btn').addEventListener('click',()=>this.retryExercise());
+document.getElementById('next-btn').addEventListener('click',()=>this.nextExercise());
+
+window.addEventListener('click',e=>{
+if(e.target.classList.contains('modal')){e.target.style.display='none'}
+});
 }
 
 showAuthSection(){
@@ -262,7 +340,7 @@ showMainContent(){
 document.getElementById('auth-section').style.display='none';
 document.getElementById('main-content').style.display='block';
 document.getElementById('user-info').style.display='flex';
-document.getElementById('username-display').textContent=this.user.username;
+document.getElementById('username-display').textContent=this.user.username+(this.user.role==='admin'?' 👑':'');
 if(this.user.role==='admin'){document.getElementById('admin-panel').style.display='block'}
 this.renderBoard();
 }
@@ -271,26 +349,37 @@ renderBoard(){
 const boardEl=document.getElementById('chess-board');
 boardEl.innerHTML='';
 const board=this.chess.board();
+const ranks=['8','7','6','5','4','3','2','1'];
+const files=['a','b','c','d','e','f','g','h'];
 for(let row=0;row<8;row++){
 for(let col=0;col<8;col++){
 const sq=document.createElement('div');
 sq.className=`square ${(row+col)%2===0?'light':'dark'}`;
 sq.dataset.row=row;
 sq.dataset.col=col;
+if(col===0){
+const rank=document.createElement('span');
+rank.className='coord coord-rank';
+rank.textContent=ranks[row];
+sq.appendChild(rank);
+}
+if(row===7){
+const file=document.createElement('span');
+file.className='coord coord-file';
+file.textContent=files[col];
+sq.appendChild(file);
+}
 const piece=board[row][col];
-if(piece){sq.textContent=this.getPieceSymbol(piece)}
+if(piece){
+const img=document.createElement('img');
+img.src=PIECE_IMAGES[piece.color][piece.type];
+img.alt=piece.type;
+sq.appendChild(img);
+}
 sq.addEventListener('click',()=>this.handleSquareClick(row,col));
 boardEl.appendChild(sq);
 }
 }
-}
-
-getPieceSymbol(piece){
-const symbols={
-'w':{'k':'♔','q':'♕','r':'♖','b':'♗','n':'♘','p':'♙'},
-'b':{'k':'♚','q':'♛','r':'♜','b':'♝','n':'♞','p':'♟'}
-};
-return symbols[piece.color][piece.type];
 }
 
 coordsToSquare(row,col){return String.fromCharCode(97+col)+(8-row)}
@@ -298,10 +387,10 @@ squareToCoords(sq){return{row:8-parseInt(sq[1]),col:sq.charCodeAt(0)-97}}
 
 handleSquareClick(row,col){
 if(!this.currentExercise)return;
+if(this.lastError)return;
 const board=this.chess.board();
 const piece=board[row][col];
 const sqName=this.coordsToSquare(row,col);
-
 if(this.selectedSquare){
 const fromSq=this.selectedSquare;
 try{
@@ -340,98 +429,154 @@ checkMove(move){
 if(this.currentMoveIndex>=this.exerciseMoves.length)return;
 const expected=this.exerciseMoves[this.currentMoveIndex];
 const feedback=document.getElementById('move-feedback');
+const resetBtn=document.getElementById('reset-btn');
+const retryBtn=document.getElementById('retry-btn');
+const nextBtn=document.getElementById('next-btn');
+const moveCounter=document.getElementById('move-counter');
 
 if(move.san===expected){
 this.correctMoves++;
-feedback.textContent='¡Correcto! ✓ ('+move.san+')';
+this.lastError=null;
+feedback.textContent='✅ ¡Correcto! '+move.san;
 feedback.className='correct';
 this.currentMoveIndex++;
+moveCounter.textContent=`Jugada ${this.currentMoveIndex} de ${this.exerciseMoves.length}`;
+retryBtn.style.display='none';
+nextBtn.style.display='none';
+resetBtn.style.display='inline-block';
 if(this.currentMoveIndex>=this.exerciseMoves.length){
-setTimeout(()=>{
-feedback.textContent='¡Ejercicio completado! 🎉';
+feedback.textContent='🎉 ¡Ejercicio completado!';
+resetBtn.style.display='none';
+nextBtn.style.display='inline-block';
 this.saveProgress(true);
 this.loadStats();
 this.loadExercises();
-},500);
-}else{
-this.saveProgress(false);
-this.loadStats();
 }
 }else{
 this.incorrectMoves++;
-feedback.textContent='Incorrecto ✗ (esperado: '+expected+', hiciste: '+move.san+')';
-feedback.className='incorrect';
+this.lastError={expected,actual:move.san};
 this.chess.undo();
+feedback.innerHTML=`❌ Incorrecto. Esperado: <strong>${expected}</strong>, hiciste: <strong>${move.san}</strong>`;
+feedback.className='incorrect';
+retryBtn.style.display='inline-block';
+nextBtn.style.display='none';
+resetBtn.style.display='none';
 this.saveProgress(false);
 this.loadStats();
+}
+}
+
+retryExercise(){
+if(!this.currentExercise)return;
+this.lastError=null;
+this.chess.undo();
+document.getElementById('move-feedback').textContent='';
+document.getElementById('move-feedback').className='';
+document.getElementById('retry-btn').style.display='none';
+document.getElementById('reset-btn').style.display='inline-block';
+this.renderBoard();
+}
+
+resetExercise(){
+if(this.currentExercise)this.loadExercise(this.currentExercise,false);
+}
+
+nextExercise(){
+if(this.themeIndex<this.currentThemeExercises.length-1){
+this.themeIndex++;
+const next=this.currentThemeExercises[this.themeIndex];
+this.loadExercise(next,true);
+}else{
+const feedback=document.getElementById('move-feedback');
+feedback.textContent='🏆 ¡Has completado todos los ejercicios del tema "'+this.currentTheme+'"!';
+feedback.className='info';
+document.getElementById('next-btn').style.display='none';
+document.getElementById('reset-btn').style.display='none';
 }
 }
 
 saveProgress(completed){
 if(!this.currentExercise)return;
 const key=`progress_${this.user.id}_${this.currentExercise.id}`;
-const existing=JSON.parse(localStorage.getItem(key)||'{"correct":0,"incorrect":0,"completed":false}');
+const existing=JSON.parse(localStorage.getItem(key)||'{"correct":0,"incorrect":0,"completed":false,"attempts":0}');
 const data={
-correct:existing.correct+this.correctMoves,
-incorrect:existing.incorrect+this.incorrectMoves,
-completed:completed||existing.completed
+correct:existing.correct+(this.lastError?0:this.correctMoves),
+incorrect:existing.incorrect+(this.lastError?1:0),
+completed:completed||existing.completed,
+attempts:existing.attempts+1
 };
 localStorage.setItem(key,JSON.stringify(data));
 }
 
 loadExercises(){
 const exercises=JSON.parse(localStorage.getItem('exercises')||'[]');
-this.renderExercisesList(exercises);
+const themes={};
+exercises.forEach(ex=>{
+const theme=ex.theme||'Sin tema';
+if(!themes[theme])themes[theme]=[];
+themes[theme].push(ex);
+});
+this.renderThemes(themes);
 }
 
-renderExercisesList(exercises){
+renderThemes(themes){
 const c=document.getElementById('exercises-container');
 c.innerHTML='';
-if(exercises.length===0){
-c.innerHTML='<p style="color:#999;text-align:center;padding:1rem">No hay ejercicios aún</p>';
+const themeNames=Object.keys(themes);
+if(themeNames.length===0){
+c.innerHTML='<p style="color:#999;text-align:center;padding:1rem">No hay ejercicios. El administrador debe cargar un archivo PGN.</p>';
 return;
 }
-exercises.forEach(ex=>{
+themeNames.forEach(theme=>{
+const section=document.createElement('div');
+section.className='theme-section';
+const title=document.createElement('div');
+title.className='theme-title';
+const completedCount=themes[theme].filter(ex=>{
+const key=`progress_${this.user.id}_${ex.id}`;
+const p=JSON.parse(localStorage.getItem(key)||'{}');
+return p.completed;
+}).length;
+title.innerHTML=`<span>📁 ${theme}</span><span>${completedCount}/${themes[theme].length}</span>`;
+const exercisesDiv=document.createElement('div');
+exercisesDiv.className='theme-exercises';
+exercisesDiv.style.display='none';
+themes[theme].forEach(ex=>{
 const item=document.createElement('div');
 item.className='exercise-item';
 const key=`progress_${this.user.id}_${ex.id}`;
 const progress=JSON.parse(localStorage.getItem(key)||'{}');
 if(progress.completed)item.classList.add('completed');
-item.innerHTML=`
-<div class="exercise-item-title">${ex.title}</div>
-<div class="exercise-item-difficulty">${this.getDifficultyLabel(ex.difficulty)}</div>
-${this.user.role==='admin'?`<div class="exercise-actions">
-<button class="btn-edit" data-id="${ex.id}">Editar</button>
-<button class="btn-delete" data-id="${ex.id}">Eliminar</button>
-</div>`:''}
-`;
-item.addEventListener('click',e=>{
-if(e.target.classList.contains('btn-edit')){
-e.stopPropagation();
-this.openExerciseModal(ex);
-}else if(e.target.classList.contains('btn-delete')){
-e.stopPropagation();
-if(confirm('¿Eliminar este ejercicio?')){this.deleteExercise(ex.id)}
-}else{
-this.loadExercise(ex);
+item.innerHTML=`<div class="exercise-item-title">${ex.title}</div><div class="exercise-item-status">${progress.completed?'✅ Completado':'⏳ Pendiente'}</div>`;
+item.addEventListener('click',()=>{
+this.currentTheme=theme;
+this.currentThemeExercises=themes[theme];
+this.themeIndex=this.currentThemeExercises.findIndex(e=>e.id===ex.id);
+this.loadExercise(ex,true);
 document.querySelectorAll('.exercise-item').forEach(i=>i.classList.remove('active'));
 item.classList.add('active');
-}
 });
-c.appendChild(item);
+exercisesDiv.appendChild(item);
+});
+title.addEventListener('click',()=>{
+exercisesDiv.style.display=exercisesDiv.style.display==='none'?'block':'none';
+});
+section.appendChild(title);
+section.appendChild(exercisesDiv);
+c.appendChild(section);
 });
 }
 
-getDifficultyLabel(d){return{'easy':'Fácil','medium':'Medio','hard':'Difícil'}[d]||'Medio'}
-
-loadExercise(ex){
+loadExercise(ex,autoStart){
 this.currentExercise=ex;
 this.currentMoveIndex=0;
 this.correctMoves=0;
 this.incorrectMoves=0;
 this.selectedSquare=null;
+this.lastError=null;
 document.getElementById('exercise-title').textContent=ex.title;
-document.getElementById('exercise-description').textContent=ex.description||'';
+document.getElementById('exercise-theme').textContent='📁 Tema: '+(ex.theme||'Sin tema');
+document.getElementById('exercise-description').textContent=ex.description||'Resuelve la secuencia de movimientos.';
 this.exerciseMoves=ex.moves.trim().split(/\s+/).filter(m=>m);
 this.playerColor=ex.color||'w';
 if(ex.fen&&ex.fen.trim()){
@@ -442,97 +587,149 @@ this.chess.reset();
 this.renderBoard();
 document.getElementById('move-feedback').textContent='';
 document.getElementById('move-feedback').className='';
+document.getElementById('move-counter').textContent=`Jugada 1 de ${this.exerciseMoves.length}`;
+document.getElementById('reset-btn').style.display='inline-block';
+document.getElementById('retry-btn').style.display='none';
+document.getElementById('next-btn').style.display='none';
+if(autoStart){
+const feedback=document.getElementById('move-feedback');
+feedback.textContent='💡 Juegan '+ (this.playerColor==='w'?'blancas':'negras') +'. Haz tu primera jugada.';
+feedback.className='info';
 }
-
-resetExercise(){if(this.currentExercise)this.loadExercise(this.currentExercise)}
+}
 
 loadStats(){
 const exercises=JSON.parse(localStorage.getItem('exercises')||'[]');
 let completed=0,totalCorrect=0,totalIncorrect=0;
+const themesCompleted={};
 exercises.forEach(ex=>{
 const key=`progress_${this.user.id}_${ex.id}`;
 const p=JSON.parse(localStorage.getItem(key)||'{}');
-if(p.completed)completed++;
+if(p.completed){
+completed++;
+const theme=ex.theme||'Sin tema';
+themesCompleted[theme]=true;
+}
 totalCorrect+=p.correct||0;
 totalIncorrect+=p.incorrect||0;
 });
 const acc=totalCorrect+totalIncorrect>0?((totalCorrect/(totalCorrect+totalIncorrect))*100).toFixed(1):0;
 document.getElementById('completed-count').textContent=completed;
 document.getElementById('accuracy-percent').textContent=acc+'%';
+document.getElementById('themes-count').textContent=Object.keys(themesCompleted).length;
 const pct=exercises.length>0?(completed/exercises.length*100):0;
 document.getElementById('progress-fill').style.width=pct+'%';
 }
 
-openExerciseModal(ex=null){
-const modal=document.getElementById('exercise-modal');
-const form=document.getElementById('exercise-form');
-form.reset();
-if(ex){
-document.getElementById('modal-title').textContent='Editar Ejercicio';
-document.getElementById('exercise-id').value=ex.id;
-document.getElementById('exercise-title-input').value=ex.title;
-document.getElementById('exercise-description-input').value=ex.description||'';
-document.getElementById('exercise-difficulty').value=ex.difficulty;
-document.getElementById('exercise-fen').value=ex.fen||'';
-document.getElementById('exercise-color').value=ex.color||'w';
-document.getElementById('pgn-content').value=ex.moves;
-}else{
-document.getElementById('modal-title').textContent='Nuevo Ejercicio';
-document.getElementById('exercise-id').value='';
+handlePgnFile(e){
+const file=e.target.files[0];
+if(!file)return;
+const reader=new FileReader();
+reader.onload=ev=>{
+const content=ev.target.result;
+const exercises=this.parsePgn(content);
+if(exercises.length===0){
+alert('No se encontraron ejercicios válidos en el archivo PGN.');
+return;
 }
-modal.style.display='block';
-}
-
-saveExercise(){
-const exercises=JSON.parse(localStorage.getItem('exercises')||'[]');
-const id=document.getElementById('exercise-id').value;
-const data={
-title:document.getElementById('exercise-title-input').value,
-description:document.getElementById('exercise-description-input').value,
-difficulty:document.getElementById('exercise-difficulty').value,
-fen:document.getElementById('exercise-fen').value,
-color:document.getElementById('exercise-color').value,
-moves:document.getElementById('pgn-content').value
+const preview=document.getElementById('pgn-preview');
+preview.style.display='block';
+preview.innerHTML='<strong>Ejercicios encontrados ('+exercises.length+'):</strong><br><br>'+
+exercises.map((ex,i)=>`<div class="pgn-exercise-item"><strong>${i+1}. ${ex.title}</strong><br>Tema: ${ex.theme}<br>Movimientos: ${ex.moves}</div>`).join('');
+document.getElementById('confirm-pgn-btn').style.display='block';
+document.getElementById('confirm-pgn-btn').dataset.exercises=JSON.stringify(exercises);
 };
-if(id){
-const idx=exercises.findIndex(e=>e.id==id);
-if(idx>=0){exercises[idx]={...exercises[idx],...data}}
-}else{
-data.id=Date.now();
-data.createdBy=this.user.id;
-exercises.push(data);
-}
-localStorage.setItem('exercises',JSON.stringify(exercises));
-document.getElementById('exercise-modal').style.display='none';
-this.loadExercises();
+reader.readAsText(file);
 }
 
-deleteExercise(id){
-let exercises=JSON.parse(localStorage.getItem('exercises')||'[]');
-exercises=exercises.filter(e=>e.id!=id);
+parsePgn(content){
+const exercises=[];
+const games=content.split(/\n\s*\n/);
+games.forEach(game=>{
+const lines=game.trim().split('\n').filter(l=>l.trim());
+if(lines.length===0)return;
+const headers={};
+const moveLines=[];
+lines.forEach(line=>{
+const headerMatch=line.match(/^\[(\w+)\s+"([^"]*)"\]/);
+if(headerMatch){
+headers[headerMatch[1]]=headerMatch[2];
+}else{
+moveLines.push(line);
+}
+});
+if(!headers.Event&&!headers.Site)return;
+const moveText=moveLines.join(' ');
+const cleaned=moveText
+.replace(/\{[^}]*\}/g,'')
+.replace(/;.*$/gm,'')
+.replace(/\d+\.\.\./g,'')
+.replace(/\d+\./g,'')
+.replace(/\s+/g,' ')
+.replace(/[0-9]+\s*-\s*[0-9]+/g,'')
+.replace(/\s*1-0\s*$/,'').replace(/\s*0-1\s*$/,'').replace(/\s*1\/2-1\/2\s*$/,'').replace(/\s*\*\s*$/,'')
+.trim();
+const moves=cleaned.split(/\s+/).filter(m=>m&&m!=='1-0'&&m!=='0-1'&&m!=='1/2-1/2'&&m!=='*');
+if(moves.length===0)return;
+exercises.push({
+id:Date.now()+Math.random()*1000,
+title:headers.Event||'Ejercicio sin título',
+theme:headers.Site||'Sin tema',
+description:headers.Comment||'',
+fen:headers.FEN||'',
+color:headers.FEN?(headers.FEN.split(' ')[1]||'w'):'w',
+moves:moves.join(' ')
+});
+});
+return exercises;
+}
+
+confirmPgnImport(){
+const btn=document.getElementById('confirm-pgn-btn');
+const exercises=JSON.parse(btn.dataset.exercises);
+const existing=JSON.parse(localStorage.getItem('exercises')||'[]');
+exercises.forEach(ex=>{ex.createdBy=this.user.id;ex.createdAt=new Date().toISOString()});
+const all=[...existing,...exercises];
+localStorage.setItem('exercises',JSON.stringify(all));
+document.getElementById('pgn-modal').style.display='none';
+alert('✅ '+exercises.length+' ejercicios importados correctamente.');
+this.loadExercises();
+this.loadStats();
+}
+
+saveManualExercise(){
+const exercises=JSON.parse(localStorage.getItem('exercises')||'[]');
+const newEx={
+id:Date.now(),
+title:document.getElementById('m-title').value.trim(),
+theme:document.getElementById('m-theme').value.trim(),
+description:document.getElementById('m-description').value.trim(),
+fen:document.getElementById('m-fen').value.trim(),
+color:document.getElementById('m-color').value,
+moves:document.getElementById('m-moves').value.trim(),
+createdBy:this.user.id,
+createdAt:new Date().toISOString()
+};
+exercises.push(newEx);
 localStorage.setItem('exercises',JSON.stringify(exercises));
+document.getElementById('manual-modal').style.display='none';
+alert('✅ Ejercicio creado correctamente.');
 this.loadExercises();
 this.loadStats();
 }
 }
 
-// Crear admin por defecto
 if(!localStorage.getItem('users')){
 localStorage.setItem('users',JSON.stringify([{id:1,username:'admin',password:'admin123',role:'admin'}]));
 }
 
-// Ejemplo de ejercicio por defecto si no hay ninguno
 if(!localStorage.getItem('exercises')){
-localStorage.setItem('exercises',JSON.stringify([{
-id:1000,
-title:'Apertura Italiana - Ejemplo',
-description:'Practica los primeros movimientos de la Apertura Italiana',
-difficulty:'easy',
-fen:'',
-color:'w',
-moves:'e4 e5 Nf3 Nc6 Bc4 Bc5',
-createdBy:1
-}]));
+localStorage.setItem('exercises',JSON.stringify([
+{id:1001,title:'Mate en 1 - Torre',theme:'Mates básicos',description:'Encuentra el mate en una jugada con la torre',fen:'6k1/5ppp/8/8/8/8/5PPP/R5K1 w - - 0 1',color:'w',moves:'Ra8#'},
+{id:1002,title:'Mate en 1 - Dama',theme:'Mates básicos',description:'Encuentra el mate en una jugada con la dama',fen:'6k1/5ppp/8/8/8/8/5PPP/3Q2K1 w - - 0 1',color:'w',moves:'Qd8#'},
+{id:1003,title:'Apertura Italiana',theme:'Aperturas',description:'Practica los movimientos de la Apertura Italiana',fen:'',color:'w',moves:'e4 e5 Nf3 Nc6 Bc4 Bc5'},
+{id:1004,title:'Defensa Siciliana',theme:'Aperturas',description:'Practica la Defensa Siciliana',fen:'',color:'w',moves:'e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3'}
+]));
 }
 
 document.addEventListener('DOMContentLoaded',()=>{new ChessApp()});
