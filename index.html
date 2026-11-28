@@ -84,8 +84,9 @@ header h1{color:#667eea;font-size:1.5rem}
 .modal-content input:focus,.modal-content textarea:focus{outline:none;border-color:#667eea}
 .modal-content button[type="submit"]{width:100%;padding:1rem;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border:none;border-radius:8px;font-size:1rem;cursor:pointer;margin-top:15px}
 .modal-content small{color:#666;display:block;margin-bottom:10px}
-.pgn-preview{background:#f8f9fa;padding:1rem;border-radius:8px;margin-top:1rem;max-height:200px;overflow-y:auto;font-family:monospace;font-size:0.85rem}
+.pgn-preview{background:#f8f9fa;padding:1rem;border-radius:8px;margin-top:1rem;max-height:300px;overflow-y:auto;font-family:monospace;font-size:0.85rem}
 .pgn-exercise-item{padding:0.5rem;margin-bottom:0.3rem;background:white;border-radius:4px;border-left:3px solid #667eea}
+.pgn-error{background:#f8d7da;color:#721c24;padding:0.5rem;border-radius:4px;margin-top:10px}
 @media(max-width:1024px){.main-layout{grid-template-columns:1fr}.sidebar{max-height:none}}
 @media(max-width:768px){#chess-board{grid-template-columns:repeat(8,42px);grid-template-rows:repeat(8,42px)}.square{width:42px;height:42px}.square img{width:38px;height:38px}.coord{font-size:10px}header h1{font-size:1.1rem}#move-controls button{padding:0.6rem 0.9rem;font-size:0.9rem}}
 </style>
@@ -168,7 +169,7 @@ header h1{color:#667eea;font-size:1.5rem}
 <div class="modal-content">
 <span class="close" data-modal="pgn-modal">&times;</span>
 <h2>📤 Cargar archivo PGN</h2>
-<p style="color:#666;margin-bottom:1rem">Sube un archivo PGN con múltiples ejercicios. Cada partida será un ejercicio separado. Agrupa los ejercicios por tema usando el campo [Site "Nombre del tema"].</p>
+<p style="color:#666;margin-bottom:1rem">Sube un archivo PGN con múltiples ejercicios. Cada partida será un ejercicio separado. Usa el campo [Site "Tema"] para agrupar ejercicios.</p>
 <label for="pgn-file-input">Seleccionar archivo PGN:</label>
 <input type="file" id="pgn-file-input" accept=".pgn,.txt">
 <div id="pgn-preview" class="pgn-preview" style="display:none"></div>
@@ -302,7 +303,6 @@ document.getElementById('manual-form').reset();
 document.getElementById('clear-data-btn').addEventListener('click',()=>{
 if(confirm('¿Seguro que quieres borrar TODOS los ejercicios y progreso? Esta acción no se puede deshacer.')){
 localStorage.removeItem('exercises');
-localStorage.removeItem('themes');
 const keys=Object.keys(localStorage);
 keys.forEach(k=>{if(k.startsWith('progress_'))localStorage.removeItem(k)});
 this.loadExercises();
@@ -316,18 +316,14 @@ document.getElementById('confirm-pgn-btn').addEventListener('click',()=>this.con
 document.getElementById('manual-form').addEventListener('submit',e=>{e.preventDefault();this.saveManualExercise()});
 
 document.querySelectorAll('.close').forEach(btn=>{
-btn.addEventListener('click',()=>{
-document.getElementById(btn.dataset.modal).style.display='none';
-});
+btn.addEventListener('click',()=>{document.getElementById(btn.dataset.modal).style.display='none'});
 });
 
 document.getElementById('reset-btn').addEventListener('click',()=>this.resetExercise());
 document.getElementById('retry-btn').addEventListener('click',()=>this.retryExercise());
 document.getElementById('next-btn').addEventListener('click',()=>this.nextExercise());
 
-window.addEventListener('click',e=>{
-if(e.target.classList.contains('modal')){e.target.style.display='none'}
-});
+window.addEventListener('click',e=>{if(e.target.classList.contains('modal')){e.target.style.display='none'}});
 }
 
 showAuthSection(){
@@ -357,25 +353,10 @@ const sq=document.createElement('div');
 sq.className=`square ${(row+col)%2===0?'light':'dark'}`;
 sq.dataset.row=row;
 sq.dataset.col=col;
-if(col===0){
-const rank=document.createElement('span');
-rank.className='coord coord-rank';
-rank.textContent=ranks[row];
-sq.appendChild(rank);
-}
-if(row===7){
-const file=document.createElement('span');
-file.className='coord coord-file';
-file.textContent=files[col];
-sq.appendChild(file);
-}
+if(col===0){const rank=document.createElement('span');rank.className='coord coord-rank';rank.textContent=ranks[row];sq.appendChild(rank)}
+if(row===7){const file=document.createElement('span');file.className='coord coord-file';file.textContent=files[col];sq.appendChild(file)}
 const piece=board[row][col];
-if(piece){
-const img=document.createElement('img');
-img.src=PIECE_IMAGES[piece.color][piece.type];
-img.alt=piece.type;
-sq.appendChild(img);
-}
+if(piece){const img=document.createElement('img');img.src=PIECE_IMAGES[piece.color][piece.type];img.alt=piece.type;sq.appendChild(img)}
 sq.addEventListener('click',()=>this.handleSquareClick(row,col));
 boardEl.appendChild(sq);
 }
@@ -395,33 +376,18 @@ if(this.selectedSquare){
 const fromSq=this.selectedSquare;
 try{
 const moveObj={from:fromSq,to:sqName};
-if(piece&&piece.type==='p'&&((piece.color==='w'&&row===0)||(piece.color==='b'&&row===7))){
-moveObj.promotion='q';
-}
+if(piece&&piece.type==='p'&&((piece.color==='w'&&row===0)||(piece.color==='b'&&row===7))){moveObj.promotion='q'}
 const result=this.chess.move(moveObj);
-if(result){
-this.checkMove(result);
-this.selectedSquare=null;
-this.renderBoard();
-}else{
-this.selectedSquare=null;
-this.renderBoard();
-}
-}catch(e){
-this.selectedSquare=null;
-this.renderBoard();
-}
+if(result){this.checkMove(result);this.selectedSquare=null;this.renderBoard()}
+else{this.selectedSquare=null;this.renderBoard()}
+}catch(e){this.selectedSquare=null;this.renderBoard()}
 }else if(piece&&piece.color===this.chess.turn()&&piece.color===this.playerColor){
 this.selectedSquare=sqName;
 this.renderBoard();
 const squares=document.querySelectorAll('.square');
 squares[row*8+col].classList.add('selected');
 const moves=this.chess.moves({square:sqName,verbose:true});
-moves.forEach(m=>{
-const tc=this.squareToCoords(m.to);
-const targetSq=squares[tc.row*8+tc.col];
-targetSq.classList.add(m.captured?'valid-capture':'valid-move');
-});
+moves.forEach(m=>{const tc=this.squareToCoords(m.to);const targetSq=squares[tc.row*8+tc.col];targetSq.classList.add(m.captured?'valid-capture':'valid-move')});
 }
 }
 
@@ -477,9 +443,7 @@ document.getElementById('reset-btn').style.display='inline-block';
 this.renderBoard();
 }
 
-resetExercise(){
-if(this.currentExercise)this.loadExercise(this.currentExercise,false);
-}
+resetExercise(){if(this.currentExercise)this.loadExercise(this.currentExercise,false)}
 
 nextExercise(){
 if(this.themeIndex<this.currentThemeExercises.length-1){
@@ -500,7 +464,7 @@ if(!this.currentExercise)return;
 const key=`progress_${this.user.id}_${this.currentExercise.id}`;
 const existing=JSON.parse(localStorage.getItem(key)||'{"correct":0,"incorrect":0,"completed":false,"attempts":0}');
 const data={
-correct:existing.correct+(this.lastError?0:this.correctMoves),
+correct:existing.correct+(this.lastError?0:1),
 incorrect:existing.incorrect+(this.lastError?1:0),
 completed:completed||existing.completed,
 attempts:existing.attempts+1
@@ -511,11 +475,7 @@ localStorage.setItem(key,JSON.stringify(data));
 loadExercises(){
 const exercises=JSON.parse(localStorage.getItem('exercises')||'[]');
 const themes={};
-exercises.forEach(ex=>{
-const theme=ex.theme||'Sin tema';
-if(!themes[theme])themes[theme]=[];
-themes[theme].push(ex);
-});
+exercises.forEach(ex=>{const theme=ex.theme||'Sin tema';if(!themes[theme])themes[theme]=[];themes[theme].push(ex)});
 this.renderThemes(themes);
 }
 
@@ -523,20 +483,13 @@ renderThemes(themes){
 const c=document.getElementById('exercises-container');
 c.innerHTML='';
 const themeNames=Object.keys(themes);
-if(themeNames.length===0){
-c.innerHTML='<p style="color:#999;text-align:center;padding:1rem">No hay ejercicios. El administrador debe cargar un archivo PGN.</p>';
-return;
-}
+if(themeNames.length===0){c.innerHTML='<p style="color:#999;text-align:center;padding:1rem">No hay ejercicios. El administrador debe cargar un archivo PGN.</p>';return}
 themeNames.forEach(theme=>{
 const section=document.createElement('div');
 section.className='theme-section';
 const title=document.createElement('div');
 title.className='theme-title';
-const completedCount=themes[theme].filter(ex=>{
-const key=`progress_${this.user.id}_${ex.id}`;
-const p=JSON.parse(localStorage.getItem(key)||'{}');
-return p.completed;
-}).length;
+const completedCount=themes[theme].filter(ex=>{const key=`progress_${this.user.id}_${ex.id}`;const p=JSON.parse(localStorage.getItem(key)||'{}');return p.completed}).length;
 title.innerHTML=`<span>📁 ${theme}</span><span>${completedCount}/${themes[theme].length}</span>`;
 const exercisesDiv=document.createElement('div');
 exercisesDiv.className='theme-exercises';
@@ -558,9 +511,7 @@ item.classList.add('active');
 });
 exercisesDiv.appendChild(item);
 });
-title.addEventListener('click',()=>{
-exercisesDiv.style.display=exercisesDiv.style.display==='none'?'block':'none';
-});
+title.addEventListener('click',()=>{exercisesDiv.style.display=exercisesDiv.style.display==='none'?'block':'none'});
 section.appendChild(title);
 section.appendChild(exercisesDiv);
 c.appendChild(section);
@@ -579,11 +530,8 @@ document.getElementById('exercise-theme').textContent='📁 Tema: '+(ex.theme||'
 document.getElementById('exercise-description').textContent=ex.description||'Resuelve la secuencia de movimientos.';
 this.exerciseMoves=ex.moves.trim().split(/\s+/).filter(m=>m);
 this.playerColor=ex.color||'w';
-if(ex.fen&&ex.fen.trim()){
-try{this.chess.load(ex.fen)}catch(e){this.chess.reset()}
-}else{
-this.chess.reset();
-}
+if(ex.fen&&ex.fen.trim()){try{this.chess.load(ex.fen)}catch(e){this.chess.reset()}}
+else{this.chess.reset()}
 this.renderBoard();
 document.getElementById('move-feedback').textContent='';
 document.getElementById('move-feedback').className='';
@@ -591,11 +539,7 @@ document.getElementById('move-counter').textContent=`Jugada 1 de ${this.exercise
 document.getElementById('reset-btn').style.display='inline-block';
 document.getElementById('retry-btn').style.display='none';
 document.getElementById('next-btn').style.display='none';
-if(autoStart){
-const feedback=document.getElementById('move-feedback');
-feedback.textContent='💡 Juegan '+ (this.playerColor==='w'?'blancas':'negras') +'. Haz tu primera jugada.';
-feedback.className='info';
-}
+if(autoStart){const feedback=document.getElementById('move-feedback');feedback.textContent='💡 Juegan '+(this.playerColor==='w'?'blancas':'negras')+'. Haz tu primera jugada.';feedback.className='info'}
 }
 
 loadStats(){
@@ -605,11 +549,7 @@ const themesCompleted={};
 exercises.forEach(ex=>{
 const key=`progress_${this.user.id}_${ex.id}`;
 const p=JSON.parse(localStorage.getItem(key)||'{}');
-if(p.completed){
-completed++;
-const theme=ex.theme||'Sin tema';
-themesCompleted[theme]=true;
-}
+if(p.completed){completed++;const theme=ex.theme||'Sin tema';themesCompleted[theme]=true}
 totalCorrect+=p.correct||0;
 totalIncorrect+=p.incorrect||0;
 });
@@ -626,61 +566,138 @@ const file=e.target.files[0];
 if(!file)return;
 const reader=new FileReader();
 reader.onload=ev=>{
+try{
 const content=ev.target.result;
 const exercises=this.parsePgn(content);
 if(exercises.length===0){
-alert('No se encontraron ejercicios válidos en el archivo PGN.');
+document.getElementById('pgn-preview').style.display='block';
+document.getElementById('pgn-preview').innerHTML='<div class="pgn-error">❌ No se encontraron ejercicios válidos en el archivo PGN. Verifica que tenga el formato correcto con [FEN "..."] y movimientos.</div>';
 return;
 }
 const preview=document.getElementById('pgn-preview');
 preview.style.display='block';
-preview.innerHTML='<strong>Ejercicios encontrados ('+exercises.length+'):</strong><br><br>'+
-exercises.map((ex,i)=>`<div class="pgn-exercise-item"><strong>${i+1}. ${ex.title}</strong><br>Tema: ${ex.theme}<br>Movimientos: ${ex.moves}</div>`).join('');
+preview.innerHTML='<strong style="color:#27ae60">✅ Ejercicios encontrados: '+exercises.length+'</strong><br><br>'+
+exercises.map((ex,i)=>`<div class="pgn-exercise-item"><strong>${i+1}. ${ex.title}</strong><br>📁 Tema: ${ex.theme}<br>♟️ Juegan: ${ex.color==='w'?'Blancas':'Negras'}<br>🎯 Movimientos (${ex.moves.split(' ').length}): ${ex.moves}</div>`).join('');
 document.getElementById('confirm-pgn-btn').style.display='block';
 document.getElementById('confirm-pgn-btn').dataset.exercises=JSON.stringify(exercises);
+}catch(err){
+document.getElementById('pgn-preview').style.display='block';
+document.getElementById('pgn-preview').innerHTML='<div class="pgn-error">❌ Error al procesar el archivo: '+err.message+'</div>';
+}
 };
 reader.readAsText(file);
 }
 
 parsePgn(content){
 const exercises=[];
-const games=content.split(/\n\s*\n/);
-games.forEach(game=>{
-const lines=game.trim().split('\n').filter(l=>l.trim());
-if(lines.length===0)return;
-const headers={};
-const moveLines=[];
-lines.forEach(line=>{
-const headerMatch=line.match(/^\[(\w+)\s+"([^"]*)"\]/);
-if(headerMatch){
-headers[headerMatch[1]]=headerMatch[2];
-}else{
-moveLines.push(line);
-}
-});
-if(!headers.Event&&!headers.Site)return;
-const moveText=moveLines.join(' ');
+const lines=content.split('\n');
+let currentHeaders={};
+let currentMoveLines=[];
+let exerciseCounter=0;
+
+const saveCurrentGame=()=>{
+if(Object.keys(currentHeaders).length===0)return;
+
+// Combinar todas las líneas de movimientos
+const moveText=currentMoveLines.join(' ');
+
+// Limpiar el texto de movimientos
 const cleaned=moveText
 .replace(/\{[^}]*\}/g,'')
-.replace(/;.*$/gm,'')
+.replace(/\([^)]*\)/g,'')
 .replace(/\d+\.\.\./g,'')
 .replace(/\d+\./g,'')
 .replace(/\s+/g,' ')
-.replace(/[0-9]+\s*-\s*[0-9]+/g,'')
-.replace(/\s*1-0\s*$/,'').replace(/\s*0-1\s*$/,'').replace(/\s*1\/2-1\/2\s*$/,'').replace(/\s*\*\s*$/,'')
+.replace(/\$\d+/g,'')
+.replace(/\*\s*$/g,'')
+.replace(/\s*1-0\s*$/g,'')
+.replace(/\s*0-1\s*$/g,'')
+.replace(/\s*1\/2-1\/2\s*$/g,'')
 .trim();
-const moves=cleaned.split(/\s+/).filter(m=>m&&m!=='1-0'&&m!=='0-1'&&m!=='1/2-1/2'&&m!=='*');
-if(moves.length===0)return;
+
+// Extraer movimientos válidos
+const moves=cleaned.split(/\s+/).filter(m=>{
+return m&&m.length>0&&m!=='*'&&m!=='1-0'&&m!=='0-1'&&m!=='1/2-1/2'&&!m.match(/^\d+$/);
+});
+
+if(moves.length===0){
+currentHeaders={};
+currentMoveLines=[];
+return;
+}
+
+exerciseCounter++;
+
+// Determinar título
+let title=currentHeaders.Event||'';
+if(!title||title==='?'||title==='%'){title='Ejercicio '+exerciseCounter}
+
+// Determinar tema
+let theme=currentHeaders.Site||'';
+if(!theme||theme==='?'||theme==='%'){theme='Sin tema'}
+
+// Obtener FEN
+const fen=currentHeaders.FEN||'';
+
+// Determinar color que juega
+let color='w';
+if(fen){
+const fenParts=fen.split(' ');
+color=fenParts[1]||'w';
+}
+
 exercises.push({
-id:Date.now()+Math.random()*1000,
-title:headers.Event||'Ejercicio sin título',
-theme:headers.Site||'Sin tema',
-description:headers.Comment||'',
-fen:headers.FEN||'',
-color:headers.FEN?(headers.FEN.split(' ')[1]||'w'):'w',
+id:Date.now()+Math.random()*1000+exerciseCounter,
+title:title,
+theme:theme,
+description:currentHeaders.Comment||'',
+fen:fen,
+color:color,
 moves:moves.join(' ')
 });
-});
+
+currentHeaders={};
+currentMoveLines=[];
+};
+
+for(let i=0;i<lines.length;i++){
+const line=lines[i].trim();
+
+// Detectar header
+const headerMatch=line.match(/^\[(\w+)\s+"([^"]*)"\]/);
+if(headerMatch){
+// Si ya teníamos un juego en progreso con movimientos, guardarlo
+if(Object.keys(currentHeaders).length>0&&currentMoveLines.length>0){
+saveCurrentGame();
+}
+// Si es un nuevo [Event y ya teníamos headers, es nuevo juego
+if(headerMatch[1]==='Event'&&Object.keys(currentHeaders).length>0){
+saveCurrentGame();
+}
+currentHeaders[headerMatch[1]]=headerMatch[2];
+continue;
+}
+
+// Línea vacía
+if(line===''){
+// Si tenemos headers pero no movimientos, marcar que pueden venir movimientos
+if(Object.keys(currentHeaders).length>0&&currentMoveLines.length===0){
+// No hacer nada, esperar movimientos
+}
+continue;
+}
+
+// Si tenemos headers, esta línea es de movimientos
+if(Object.keys(currentHeaders).length>0){
+currentMoveLines.push(line);
+}
+}
+
+// Guardar último juego
+if(Object.keys(currentHeaders).length>0){
+saveCurrentGame();
+}
+
 return exercises;
 }
 
@@ -721,15 +738,6 @@ this.loadStats();
 
 if(!localStorage.getItem('users')){
 localStorage.setItem('users',JSON.stringify([{id:1,username:'admin',password:'admin123',role:'admin'}]));
-}
-
-if(!localStorage.getItem('exercises')){
-localStorage.setItem('exercises',JSON.stringify([
-{id:1001,title:'Mate en 1 - Torre',theme:'Mates básicos',description:'Encuentra el mate en una jugada con la torre',fen:'6k1/5ppp/8/8/8/8/5PPP/R5K1 w - - 0 1',color:'w',moves:'Ra8#'},
-{id:1002,title:'Mate en 1 - Dama',theme:'Mates básicos',description:'Encuentra el mate en una jugada con la dama',fen:'6k1/5ppp/8/8/8/8/5PPP/3Q2K1 w - - 0 1',color:'w',moves:'Qd8#'},
-{id:1003,title:'Apertura Italiana',theme:'Aperturas',description:'Practica los movimientos de la Apertura Italiana',fen:'',color:'w',moves:'e4 e5 Nf3 Nc6 Bc4 Bc5'},
-{id:1004,title:'Defensa Siciliana',theme:'Aperturas',description:'Practica la Defensa Siciliana',fen:'',color:'w',moves:'e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3'}
-]));
 }
 
 document.addEventListener('DOMContentLoaded',()=>{new ChessApp()});
