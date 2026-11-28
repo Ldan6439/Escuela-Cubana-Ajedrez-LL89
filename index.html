@@ -32,13 +32,15 @@ header h1{color:#667eea;font-size:1.5rem}
 .progress-bar{width:100%;height:8px;background:#eee;border-radius:10px;overflow:hidden;margin-top:1rem}
 .progress-fill{height:100%;background:linear-gradient(90deg,#667eea 0%,#764ba2 100%);width:0%;transition:width 0.5s}
 .theme-section{margin-bottom:1rem}
-.theme-title{font-weight:bold;color:#764ba2;padding:0.5rem;background:#f0f0ff;border-radius:5px;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.theme-title{font-weight:bold;color:#764ba2;padding:0.7rem;background:#f0f0ff;border-radius:5px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:background 0.2s}
 .theme-title:hover{background:#e0e0ff}
+.theme-title .theme-progress{font-size:0.8rem;color:#667eea}
 .theme-exercises{margin-left:10px;margin-top:5px}
-.exercise-item{padding:0.7rem;margin-bottom:0.3rem;background:#f8f9fa;border-radius:6px;cursor:pointer;transition:all 0.3s;border-left:4px solid transparent;font-size:0.9rem}
+.exercise-item{padding:0.6rem;margin-bottom:0.3rem;background:#f8f9fa;border-radius:6px;cursor:pointer;transition:all 0.3s;border-left:4px solid transparent;font-size:0.85rem}
 .exercise-item:hover{background:#e9ecef;transform:translateX(3px)}
 .exercise-item.active{background:#667eea;color:white;border-left-color:#764ba2}
 .exercise-item.completed{border-left-color:#2ecc71}
+.exercise-item.failed{border-left-color:#e74c3c}
 .exercise-item-title{font-weight:bold}
 .exercise-item-status{font-size:0.75rem;opacity:0.8}
 #admin-panel{margin-top:2rem;padding-top:1.5rem;border-top:2px solid #eee}
@@ -74,6 +76,7 @@ header h1{color:#667eea;font-size:1.5rem}
 #move-feedback.correct{background:#d4edda;color:#155724}
 #move-feedback.incorrect{background:#f8d7da;color:#721c24}
 #move-feedback.info{background:#d1ecf1;color:#0c5460}
+#move-feedback.theme-complete{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;font-size:1.2rem}
 .modal{display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.5)}
 .modal-content{background:white;margin:3% auto;padding:2rem;border-radius:15px;width:90%;max-width:700px;max-height:90vh;overflow-y:auto}
 .close{color:#aaa;float:right;font-size:2rem;font-weight:bold;cursor:pointer}
@@ -87,6 +90,17 @@ header h1{color:#667eea;font-size:1.5rem}
 .pgn-preview{background:#f8f9fa;padding:1rem;border-radius:8px;margin-top:1rem;max-height:300px;overflow-y:auto;font-family:monospace;font-size:0.85rem}
 .pgn-exercise-item{padding:0.5rem;margin-bottom:0.3rem;background:white;border-radius:4px;border-left:3px solid #667eea}
 .pgn-error{background:#f8d7da;color:#721c24;padding:0.5rem;border-radius:4px;margin-top:10px}
+.report-container{background:#f8f9fa;padding:1rem;border-radius:8px;margin-top:1rem}
+.report-user{margin-bottom:1.5rem;padding:1rem;background:white;border-radius:8px;border-left:4px solid #667eea}
+.report-user h4{color:#667eea;margin-bottom:0.5rem}
+.report-theme{margin:0.5rem 0;padding:0.5rem;background:#f0f0ff;border-radius:4px}
+.report-theme-name{font-weight:bold;color:#764ba2}
+.report-stats{display:flex;gap:1rem;margin-top:0.3rem;font-size:0.9rem;flex-wrap:wrap}
+.report-stats span{padding:0.2rem 0.5rem;background:#e0e0ff;border-radius:4px}
+.copy-btn{padding:0.5rem 1rem;background:#27ae60;color:white;border:none;border-radius:5px;cursor:pointer;margin-top:0.5rem;font-size:0.9rem}
+.copy-btn:hover{background:#229954}
+.user-selector{margin-bottom:1rem}
+.user-selector select{width:100%;padding:0.8rem;border:2px solid #eee;border-radius:8px;font-size:1rem}
 @media(max-width:1024px){.main-layout{grid-template-columns:1fr}.sidebar{max-height:none}}
 @media(max-width:768px){#chess-board{grid-template-columns:repeat(8,42px);grid-template-rows:repeat(8,42px)}.square{width:42px;height:42px}.square img{width:38px;height:38px}.coord{font-size:10px}header h1{font-size:1.1rem}#move-controls button{padding:0.6rem 0.9rem;font-size:0.9rem}}
 </style>
@@ -142,6 +156,7 @@ header h1{color:#667eea;font-size:1.5rem}
 <h3>🔐 Panel de Administrador</h3>
 <button id="upload-pgn-btn">📤 Cargar archivo PGN</button>
 <button id="manual-exercise-btn">➕ Ejercicio manual</button>
+<button id="reports-btn">📋 Ver reportes de usuarios</button>
 <button id="clear-data-btn" style="background:#e74c3c">🗑️ Borrar todos los datos</button>
 </div>
 </aside>
@@ -151,7 +166,7 @@ header h1{color:#667eea;font-size:1.5rem}
 <div id="exercise-info">
 <h2 id="exercise-title">Bienvenido</h2>
 <p id="exercise-theme"></p>
-<p id="exercise-description">Selecciona un ejercicio del panel izquierdo para comenzar. Como administrador, puedes cargar archivos PGN con múltiples ejercicios organizados por tema.</p>
+<p id="exercise-description">Selecciona un tema del panel izquierdo para comenzar. El sistema te llevará al primer ejercicio pendiente.</p>
 <div id="move-counter"></div>
 <div id="move-controls">
 <button id="reset-btn" style="display:none">🔄 Reiniciar</button>
@@ -202,6 +217,18 @@ header h1{color:#667eea;font-size:1.5rem}
 </form>
 </div>
 </div>
+
+<div id="reports-modal" class="modal">
+<div class="modal-content" style="max-width:800px">
+<span class="close" data-modal="reports-modal">&times;</span>
+<h2>📋 Reportes de Usuarios</h2>
+<div class="user-selector">
+<label for="user-select">Seleccionar usuario:</label>
+<select id="user-select"></select>
+</div>
+<div id="report-content" class="report-container"></div>
+<button id="copy-report-btn" class="copy-btn">📋 Copiar informe</button>
+</div>
 </div>
 
 <script>
@@ -223,7 +250,7 @@ this.playerColor='w';
 this.correctMoves=0;
 this.incorrectMoves=0;
 this.selectedSquare=null;
-this.lastError=null;
+this.lastError=false;
 this.user=JSON.parse(localStorage.getItem('currentUser')||'null');
 this.init();
 }
@@ -299,6 +326,10 @@ document.getElementById('manual-exercise-btn').addEventListener('click',()=>{
 document.getElementById('manual-modal').style.display='block';
 document.getElementById('manual-form').reset();
 });
+
+document.getElementById('reports-btn').addEventListener('click',()=>this.showReports());
+document.getElementById('copy-report-btn').addEventListener('click',()=>this.copyReport());
+document.getElementById('user-select').addEventListener('change',e=>this.loadUserReport(e.target.value));
 
 document.getElementById('clear-data-btn').addEventListener('click',()=>{
 if(confirm('¿Seguro que quieres borrar TODOS los ejercicios y progreso? Esta acción no se puede deshacer.')){
@@ -402,8 +433,8 @@ const moveCounter=document.getElementById('move-counter');
 
 if(move.san===expected){
 this.correctMoves++;
-this.lastError=null;
-feedback.textContent='✅ ¡Correcto! '+move.san;
+this.lastError=false;
+feedback.textContent='✅ ¡Correcto!';
 feedback.className='correct';
 this.currentMoveIndex++;
 moveCounter.textContent=`Jugada ${this.currentMoveIndex} de ${this.exerciseMoves.length}`;
@@ -420,12 +451,12 @@ this.loadExercises();
 }
 }else{
 this.incorrectMoves++;
-this.lastError={expected,actual:move.san};
+this.lastError=true;
 this.chess.undo();
-feedback.innerHTML=`❌ Incorrecto. Esperado: <strong>${expected}</strong>, hiciste: <strong>${move.san}</strong>`;
+feedback.innerHTML='❌ Incorrecto';
 feedback.className='incorrect';
 retryBtn.style.display='inline-block';
-nextBtn.style.display='none';
+nextBtn.style.display='inline-block';
 resetBtn.style.display='none';
 this.saveProgress(false);
 this.loadStats();
@@ -434,11 +465,12 @@ this.loadStats();
 
 retryExercise(){
 if(!this.currentExercise)return;
-this.lastError=null;
+this.lastError=false;
 this.chess.undo();
 document.getElementById('move-feedback').textContent='';
 document.getElementById('move-feedback').className='';
 document.getElementById('retry-btn').style.display='none';
+document.getElementById('next-btn').style.display='none';
 document.getElementById('reset-btn').style.display='inline-block';
 this.renderBoard();
 }
@@ -451,12 +483,30 @@ this.themeIndex++;
 const next=this.currentThemeExercises[this.themeIndex];
 this.loadExercise(next,true);
 }else{
+this.showThemeComplete();
+}
+}
+
+showThemeComplete(){
 const feedback=document.getElementById('move-feedback');
-feedback.textContent='🏆 ¡Has completado todos los ejercicios del tema "'+this.currentTheme+'"!';
-feedback.className='info';
+const exercises=this.currentThemeExercises;
+let totalCorrect=0,totalIncorrect=0,completed=0;
+exercises.forEach(ex=>{
+const key=`progress_${this.user.id}_${ex.id}`;
+const p=JSON.parse(localStorage.getItem(key)||'{}');
+if(p.completed)completed++;
+totalCorrect+=p.correct||0;
+totalIncorrect+=p.incorrect||0;
+});
+const total=totalCorrect+totalIncorrect;
+const accuracy=total>0?((totalCorrect/total)*100).toFixed(1):0;
+feedback.innerHTML=`🏆 ¡Tema "${this.currentTheme}" completado!<br>✅ Ejercicios resueltos: ${completed}/${exercises.length}<br>📊 Precisión: ${accuracy}% (${totalCorrect} correctas, ${totalIncorrect} incorrectas)`;
+feedback.className='theme-complete';
 document.getElementById('next-btn').style.display='none';
 document.getElementById('reset-btn').style.display='none';
-}
+document.getElementById('retry-btn').style.display='none';
+this.loadStats();
+this.loadExercises();
 }
 
 saveProgress(completed){
@@ -490,7 +540,8 @@ section.className='theme-section';
 const title=document.createElement('div');
 title.className='theme-title';
 const completedCount=themes[theme].filter(ex=>{const key=`progress_${this.user.id}_${ex.id}`;const p=JSON.parse(localStorage.getItem(key)||'{}');return p.completed}).length;
-title.innerHTML=`<span>📁 ${theme}</span><span>${completedCount}/${themes[theme].length}</span>`;
+const pendingCount=themes[theme].length-completedCount;
+title.innerHTML=`<span>📁 ${theme}</span><span class="theme-progress">${completedCount}/${themes[theme].length}${pendingCount>0?' ('+pendingCount+' pendientes)':''}</span>`;
 const exercisesDiv=document.createElement('div');
 exercisesDiv.className='theme-exercises';
 exercisesDiv.style.display='none';
@@ -500,7 +551,8 @@ item.className='exercise-item';
 const key=`progress_${this.user.id}_${ex.id}`;
 const progress=JSON.parse(localStorage.getItem(key)||'{}');
 if(progress.completed)item.classList.add('completed');
-item.innerHTML=`<div class="exercise-item-title">${ex.title}</div><div class="exercise-item-status">${progress.completed?'✅ Completado':'⏳ Pendiente'}</div>`;
+else if(progress.attempts>0&&!progress.completed)item.classList.add('failed');
+item.innerHTML=`<div class="exercise-item-title">${ex.title}</div><div class="exercise-item-status">${progress.completed?'✅ Completado':(progress.attempts>0?'❌ Fallido':'⏳ Pendiente')}</div>`;
 item.addEventListener('click',()=>{
 this.currentTheme=theme;
 this.currentThemeExercises=themes[theme];
@@ -511,7 +563,23 @@ item.classList.add('active');
 });
 exercisesDiv.appendChild(item);
 });
-title.addEventListener('click',()=>{exercisesDiv.style.display=exercisesDiv.style.display==='none'?'block':'none'});
+title.addEventListener('click',()=>{
+this.currentTheme=theme;
+this.currentThemeExercises=themes[theme];
+const firstPending=this.currentThemeExercises.findIndex(ex=>{
+const key=`progress_${this.user.id}_${ex.id}`;
+const p=JSON.parse(localStorage.getItem(key)||'{}');
+return !p.completed;
+});
+const targetIndex=firstPending>=0?firstPending:0;
+this.themeIndex=targetIndex;
+const targetEx=this.currentThemeExercises[targetIndex];
+this.loadExercise(targetEx,true);
+document.querySelectorAll('.exercise-item').forEach(i=>i.classList.remove('active'));
+const items=exercisesDiv.querySelectorAll('.exercise-item');
+if(items[targetIndex])items[targetIndex].classList.add('active');
+exercisesDiv.style.display='block';
+});
 section.appendChild(title);
 section.appendChild(exercisesDiv);
 c.appendChild(section);
@@ -524,7 +592,7 @@ this.currentMoveIndex=0;
 this.correctMoves=0;
 this.incorrectMoves=0;
 this.selectedSquare=null;
-this.lastError=null;
+this.lastError=false;
 document.getElementById('exercise-title').textContent=ex.title;
 document.getElementById('exercise-theme').textContent='📁 Tema: '+(ex.theme||'Sin tema');
 document.getElementById('exercise-description').textContent=ex.description||'Resuelve la secuencia de movimientos.';
@@ -597,11 +665,7 @@ let exerciseCounter=0;
 
 const saveCurrentGame=()=>{
 if(Object.keys(currentHeaders).length===0)return;
-
-// Combinar todas las líneas de movimientos
 const moveText=currentMoveLines.join(' ');
-
-// Limpiar el texto de movimientos
 const cleaned=moveText
 .replace(/\{[^}]*\}/g,'')
 .replace(/\([^)]*\)/g,'')
@@ -614,38 +678,18 @@ const cleaned=moveText
 .replace(/\s*0-1\s*$/g,'')
 .replace(/\s*1\/2-1\/2\s*$/g,'')
 .trim();
-
-// Extraer movimientos válidos
 const moves=cleaned.split(/\s+/).filter(m=>{
 return m&&m.length>0&&m!=='*'&&m!=='1-0'&&m!=='0-1'&&m!=='1/2-1/2'&&!m.match(/^\d+$/);
 });
-
-if(moves.length===0){
-currentHeaders={};
-currentMoveLines=[];
-return;
-}
-
+if(moves.length===0){currentHeaders={};currentMoveLines=[];return}
 exerciseCounter++;
-
-// Determinar título
 let title=currentHeaders.Event||'';
 if(!title||title==='?'||title==='%'){title='Ejercicio '+exerciseCounter}
-
-// Determinar tema
 let theme=currentHeaders.Site||'';
 if(!theme||theme==='?'||theme==='%'){theme='Sin tema'}
-
-// Obtener FEN
 const fen=currentHeaders.FEN||'';
-
-// Determinar color que juega
 let color='w';
-if(fen){
-const fenParts=fen.split(' ');
-color=fenParts[1]||'w';
-}
-
+if(fen){const fenParts=fen.split(' ');color=fenParts[1]||'w'}
 exercises.push({
 id:Date.now()+Math.random()*1000+exerciseCounter,
 title:title,
@@ -655,49 +699,22 @@ fen:fen,
 color:color,
 moves:moves.join(' ')
 });
-
 currentHeaders={};
 currentMoveLines=[];
 };
 
 for(let i=0;i<lines.length;i++){
 const line=lines[i].trim();
-
-// Detectar header
 const headerMatch=line.match(/^\[(\w+)\s+"([^"]*)"\]/);
 if(headerMatch){
-// Si ya teníamos un juego en progreso con movimientos, guardarlo
-if(Object.keys(currentHeaders).length>0&&currentMoveLines.length>0){
-saveCurrentGame();
-}
-// Si es un nuevo [Event y ya teníamos headers, es nuevo juego
-if(headerMatch[1]==='Event'&&Object.keys(currentHeaders).length>0){
-saveCurrentGame();
-}
+if(headerMatch[1]==='Event'&&Object.keys(currentHeaders).length>0){saveCurrentGame()}
 currentHeaders[headerMatch[1]]=headerMatch[2];
 continue;
 }
-
-// Línea vacía
-if(line===''){
-// Si tenemos headers pero no movimientos, marcar que pueden venir movimientos
-if(Object.keys(currentHeaders).length>0&&currentMoveLines.length===0){
-// No hacer nada, esperar movimientos
+if(line==='')continue;
+if(Object.keys(currentHeaders).length>0){currentMoveLines.push(line)}
 }
-continue;
-}
-
-// Si tenemos headers, esta línea es de movimientos
-if(Object.keys(currentHeaders).length>0){
-currentMoveLines.push(line);
-}
-}
-
-// Guardar último juego
-if(Object.keys(currentHeaders).length>0){
-saveCurrentGame();
-}
-
+if(Object.keys(currentHeaders).length>0){saveCurrentGame()}
 return exercises;
 }
 
@@ -733,6 +750,144 @@ document.getElementById('manual-modal').style.display='none';
 alert('✅ Ejercicio creado correctamente.');
 this.loadExercises();
 this.loadStats();
+}
+
+showReports(){
+const users=JSON.parse(localStorage.getItem('users')||'[]');
+const select=document.getElementById('user-select');
+select.innerHTML='<option value="">-- Seleccionar usuario --</option>';
+users.forEach(u=>{
+const opt=document.createElement('option');
+opt.value=u.id;
+opt.textContent=u.username+(u.role==='admin'?' (Admin)':'');
+select.appendChild(opt);
+});
+document.getElementById('report-content').innerHTML='<p style="color:#999">Selecciona un usuario para ver su reporte.</p>';
+document.getElementById('copy-report-btn').style.display='none';
+document.getElementById('reports-modal').style.display='block';
+}
+
+loadUserReport(userId){
+const container=document.getElementById('report-content');
+if(!userId){container.innerHTML='<p style="color:#999">Selecciona un usuario para ver su reporte.</p>';document.getElementById('copy-report-btn').style.display='none';return}
+const users=JSON.parse(localStorage.getItem('users')||'[]');
+const user=users.find(u=>u.id==userId);
+if(!user){container.innerHTML='<p style="color:#e74c3c">Usuario no encontrado.</p>';return}
+const exercises=JSON.parse(localStorage.getItem('exercises')||'[]');
+const themes={};
+exercises.forEach(ex=>{const theme=ex.theme||'Sin tema';if(!themes[theme])themes[theme]=[];themes[theme].push(ex)});
+let html=`<h3 style="color:#667eea;margin-bottom:1rem">📊 Reporte de: ${user.username}</h3>`;
+let grandTotalCorrect=0,grandTotalIncorrect=0,grandCompleted=0,grandTotal=0;
+Object.keys(themes).forEach(theme=>{
+const themeExercises=themes[theme];
+let themeCorrect=0,themeIncorrect=0,themeCompleted=0;
+themeExercises.forEach(ex=>{
+const key=`progress_${user.id}_${ex.id}`;
+const p=JSON.parse(localStorage.getItem(key)||'{}');
+if(p.completed)themeCompleted++;
+themeCorrect+=p.correct||0;
+themeIncorrect+=p.incorrect||0;
+});
+const themeTotal=themeCorrect+themeIncorrect;
+const themeAcc=themeTotal>0?((themeCorrect/themeTotal)*100).toFixed(1):0;
+const themeStatus=themeCompleted===themeExercises.length?'✅ Completado':(themeCompleted>0?'🔄 En progreso':'⏳ No iniciado');
+grandTotalCorrect+=themeCorrect;
+grandTotalIncorrect+=themeIncorrect;
+grandCompleted+=themeCompleted;
+grandTotal+=themeExercises.length;
+html+=`<div class="report-theme">
+<div class="report-theme-name">📁 ${theme} - ${themeStatus}</div>
+<div class="report-stats">
+<span>✅ Ejercicios: ${themeCompleted}/${themeExercises.length}</span>
+<span>🎯 Correctas: ${themeCorrect}</span>
+<span>❌ Incorrectas: ${themeIncorrect}</span>
+<span>📊 Precisión: ${themeAcc}%</span>
+</div>
+</div>`;
+});
+const grandAcc=grandTotalCorrect+grandTotalIncorrect>0?((grandTotalCorrect/(grandTotalCorrect+grandTotalIncorrect))*100).toFixed(1):0;
+let evaluation='';
+const grandAccNum=parseFloat(grandAcc);
+if(grandAccNum>=90)evaluation='🏆 Excelente';
+else if(grandAccNum>=70)evaluation='✅ Bueno';
+else if(grandAccNum>=50)evaluation='⚠️ Regular';
+else if(grandTotal>0)evaluation='❌ Necesita mejorar';
+else evaluation='⏳ Sin actividad';
+html+=`<div style="margin-top:1rem;padding:1rem;background:#667eea;color:white;border-radius:8px">
+<strong>Resumen General:</strong><br>
+📁 Temas: ${Object.keys(themes).length} | 
+✅ Completados: ${grandCompleted}/${grandTotal} | 
+🎯 Correctas: ${grandTotalCorrect} | 
+❌ Incorrectas: ${grandTotalIncorrect} | 
+📊 Precisión total: ${grandAcc}% | 
+🏆 Evaluación: ${evaluation}
+</div>`;
+container.innerHTML=html;
+document.getElementById('copy-report-btn').style.display='inline-block';
+}
+
+copyReport(){
+const userId=document.getElementById('user-select').value;
+if(!userId){alert('Selecciona un usuario primero');return}
+const users=JSON.parse(localStorage.getItem('users')||'[]');
+const user=users.find(u=>u.id==userId);
+const exercises=JSON.parse(localStorage.getItem('exercises')||'[]');
+const themes={};
+exercises.forEach(ex=>{const theme=ex.theme||'Sin tema';if(!themes[theme])themes[theme]=[];themes[theme].push(ex)});
+let text=`REPORTE DE USUARIO: ${user.username}\n`;
+text+=`Fecha: ${new Date().toLocaleDateString()}\n`;
+text+=`========================================\n\n`;
+let grandTotalCorrect=0,grandTotalIncorrect=0,grandCompleted=0,grandTotal=0;
+Object.keys(themes).forEach(theme=>{
+const themeExercises=themes[theme];
+let themeCorrect=0,themeIncorrect=0,themeCompleted=0;
+themeExercises.forEach(ex=>{
+const key=`progress_${user.id}_${ex.id}`;
+const p=JSON.parse(localStorage.getItem(key)||'{}');
+if(p.completed)themeCompleted++;
+themeCorrect+=p.correct||0;
+themeIncorrect+=p.incorrect||0;
+});
+const themeTotal=themeCorrect+themeIncorrect;
+const themeAcc=themeTotal>0?((themeCorrect/themeTotal)*100).toFixed(1):0;
+const themeStatus=themeCompleted===themeExercises.length?'Completado':(themeCompleted>0?'En progreso':'No iniciado');
+grandTotalCorrect+=themeCorrect;
+grandTotalIncorrect+=themeIncorrect;
+grandCompleted+=themeCompleted;
+grandTotal+=themeExercises.length;
+text+=`TEMA: ${theme} [${themeStatus}]\n`;
+text+=`  Ejercicios: ${themeCompleted}/${themeExercises.length}\n`;
+text+=`  Correctas: ${themeCorrect} | Incorrectas: ${themeIncorrect}\n`;
+text+=`  Precisión: ${themeAcc}%\n\n`;
+});
+const grandAcc=grandTotalCorrect+grandTotalIncorrect>0?((grandTotalCorrect/(grandTotalCorrect+grandTotalIncorrect))*100).toFixed(1):0;
+let evaluation='';
+const grandAccNum=parseFloat(grandAcc);
+if(grandAccNum>=90)evaluation='Excelente';
+else if(grandAccNum>=70)evaluation='Bueno';
+else if(grandAccNum>=50)evaluation='Regular';
+else if(grandTotal>0)evaluation='Necesita mejorar';
+else evaluation='Sin actividad';
+text+=`========================================\n`;
+text+=`RESUMEN GENERAL\n`;
+text+=`========================================\n`;
+text+=`Temas: ${Object.keys(themes).length}\n`;
+text+=`Ejercicios completados: ${grandCompleted}/${grandTotal}\n`;
+text+=`Total correctas: ${grandTotalCorrect}\n`;
+text+=`Total incorrectas: ${grandTotalIncorrect}\n`;
+text+=`Precisión total: ${grandAcc}%\n`;
+text+=`Evaluación: ${evaluation}\n`;
+navigator.clipboard.writeText(text).then(()=>{
+alert('✅ Informe copiado al portapapeles. Puedes pegarlo en Word, Excel, email, etc.');
+}).catch(()=>{
+const ta=document.createElement('textarea');
+ta.value=text;
+document.body.appendChild(ta);
+ta.select();
+document.execCommand('copy');
+document.body.removeChild(ta);
+alert('✅ Informe copiado al portapapeles.');
+});
 }
 }
 
